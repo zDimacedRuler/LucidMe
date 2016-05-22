@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">LucidMe</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <!-- hint-->
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_username">User Name</string>
+    <string name="hint_write_your_dream">Write your Dream</string>
+    <string name="hint_title">Title</string>
+
+    <string name="sign_up_button_text">SignUp</string>
+    <string name="new_dreamer_text">New Dreamer?</string>
+    <string name="login_text">Login</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_dream">DreamActivity</string>
+    <string name="title_activity_dream_journal">DreamJournalActivity</string>
+    <!-- Error-->
+    <string name="dialog_title_error">Error</string>
+    <string name="error_message_failed_sign_in_no_network">There was a problem with the network connection.\nAre you sure you\'re connected to the internet?</string>
+    <string name="log_error_invalid_provider">"Invalid provider: "</string>
+    <string name="log_error_failed_to_change_password">"Failed to change the password: "</string>
+    <string name="error_invalid_email_not_valid">%s is not a valid email</string>
+    <string name="error_message_email_issue">There was an error with your email; please check that you entered it correctly.</string>
+    <string name="error_email_taken">The email is already taken.</string>
+    <string name="error_invalid_password_not_valid">Please enter a password that is at least 6 characters long.</string>
+    <string name="error_cannot_be_empty">This cannot be empty.</string>
+    <string name="logout">Logout</string>
+
+    <string name="delete_dream">Delete Dream Record?</string>
+    <string name="title_activity_dream_detail">DreamDetailActivity</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="search">search</string>
+    <string name="title_activity_set_tag">SetTagActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="choose_dreamsigns">Choose DreamSigns</string>
+    <string name="disable_all_text">Notifications bothering you or taking a break.Simply disable all the tools and enable them again to dive into the world of lucid dreaming.</string>
+    <string name="reality_check_text">Being aware of your surrounding is the key in lucid dreaming.Get notified to do reality checks.</string>
+    <string name="notification_text">Notifications will prompt u to do Reality Checks. Control them here.</string>
+    <string name="wakeup_with_journal_text">Wake up in the morning and your dream journal will simply be a tap away. Dream journaling is the perfect way to start your day.</string>
+    <string name="sleep_with_journal_text">Read your nightly adventures everyday before sleeping. Incubate any of your previous dreams to increase the chance of lucidity in your dreams.</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+</resources>

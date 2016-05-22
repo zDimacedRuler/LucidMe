@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.amankumar.lucidme.UI.DreamActivity">
+    <item
+        android:id="@+id/action_dream_signs"
+        android:orderInCategory="200"
+        android:title="Dream Signs"
+        android:icon="@drawable/ic_label_white_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_audio_input"
+        android:orderInCategory="100"
+        android:title="Speak"
+        android:icon="@drawable/ic_audio_white"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_dream_info"
+        android:orderInCategory="40"
+        android:title="Info"
+        android:icon="@drawable/ic_info_outline_white_24dp"
+        app:showAsAction="never" />
+
+</menu>

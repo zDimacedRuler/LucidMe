@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.example.amankumar.lucidme.UI.SettingsActivity">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/appbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="100"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="30"
+                            android:drawableLeft="@drawable/ic_disable_gray"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-condensed"
+                            android:padding="14dp"
+                            android:text="Disable All"
+                            android:textSize="20dp"
+                            android:textStyle="bold" />
+
+                        <Switch
+                            android:id="@+id/S_disable_all_switch"
+                            android:layout_width="match_parent"
+                            android:checked="true"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="70"
+                            android:padding="14dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-condensed"
+                        android:paddingBottom="14dp"
+                        android:paddingLeft="14dp"
+                        android:paddingRight="14dp"
+                        android:text="@string/disable_all_text"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/S_to_disable_view"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="100"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:drawableLeft="@drawable/ic_reality_check_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:padding="14dp"
+                                android:text="Reality Check"
+                                android:textSize="20dp"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="70"
+                                android:checked="true"
+                                android:padding="14dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:text="@string/reality_check_text"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:paddingTop="14dp"
+                            android:weightSum="100">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:drawableLeft="@drawable/ic_alarm_black_24dp"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:gravity="center_vertical"
+                                android:text="From"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:drawableLeft="@drawable/ic_alarm_black_24dp"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:gravity="center_vertical"
+                                android:text="To"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:drawableLeft="@drawable/ic_times_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:gravity="center_vertical"
+                                android:text="Times"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingBottom="14dp"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:weightSum="100">
+
+                            <Button
+                                android:id="@+id/S_from_time_picker"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:gravity="center_vertical"
+                                android:onClick="showTimePickerFrom"
+                                android:text="08:00 AM"
+                                android:textColor="@color/light_black"
+                                android:textSize="16sp" />
+
+                            <Button
+                                android:id="@+id/S_to_time_picker"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:gravity="center_vertical"
+                                android:onClick="showTimePickerTo"
+                                android:text="08:00 PM"
+                                android:textColor="@color/light_black"
+                                android:textSize="16sp" />
+
+                            <Button
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="33"
+                                android:gravity="center_vertical"
+                                android:text="5"
+                                android:textColor="@color/light_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="30"
+                            android:drawableLeft="@drawable/ic_notifications_gray"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-condensed"
+                            android:padding="14dp"
+                            android:text="Notification"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:text="@string/notification_text"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="100"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:drawableLeft="@drawable/ic_sound_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:padding="14dp"
+                                android:text="Sound"
+                                android:textSize="18sp" />
+
+                            <Switch
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="70"
+                                android:checked="true"
+                                android:padding="14dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="100"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:drawableLeft="@drawable/ic_vibration_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:padding="14dp"
+                                android:text="Vibrate"
+                                android:textSize="18sp" />
+
+                            <Switch
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="70"
+                                android:checked="true"
+                                android:padding="14dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:drawableLeft="@drawable/ic_wakeup_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:padding="14dp"
+                                android:text="WakeUp with Journal"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:id="@+id/S_wake_up_with_journal_switch"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="70"
+                                android:checked="true"
+                                android:padding="14dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:text="@string/wakeup_with_journal_text"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/S_wake_up_with_journal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:onClick="WakeUpWithJournalHandler"
+                            android:text="08:00 AM"
+                            android:textColor="@color/light_black"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:drawableLeft="@drawable/ic_sleep_gray"
+                                android:drawablePadding="5dp"
+                                android:fontFamily="sans-serif-condensed"
+                                android:padding="14dp"
+                                android:text="Sleep with Journal"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="70"
+                                android:checked="true"
+                                android:padding="14dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:text="@string/sleep_with_journal_text"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/S_sleep_with_journal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:onClick="SleepWithJournalPicker"
+                            android:text="08:00 AM"
+                            android:textColor="@color/light_black"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

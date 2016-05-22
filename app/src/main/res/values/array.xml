@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="DreamSigns">
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Time Travel</item>
+        <item>Angry</item>
+        <item>Nightmare</item>
+        <item>murder</item>
+    </array>
+</resources>
