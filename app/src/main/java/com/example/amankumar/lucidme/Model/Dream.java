@@ -1,9 +1,8 @@
 package com.example.amankumar.lucidme.Model;
 
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.firebase.client.ServerValue;
+import com.google.firebase.database.ServerValue;
 
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
@@ -12,10 +11,10 @@ import java.util.HashMap;
 public class Dream {
     String titleDream;
     String dream;
-    GregorianCalendar calendar;
+    long dateOfDream;
     //added later
     HashMap<String,Object> timeStampLastChanged;
-    HashMap<String,Object> dreamSigns;
+    HashMap<String,Object> userDreamSigns;
     String lucid;
     String lucidTechnique;
     String additionalNotes;
@@ -23,11 +22,11 @@ public class Dream {
     public Dream() {
     }
 
-    public Dream(String titleDream, String dream,GregorianCalendar calendar,HashMap<String,Object> dreamSigns,String lucid,String lucidTechnique,String additionalNotes) {
+    public Dream(String titleDream, String dream, long dateOfDream, HashMap<String,Object> userDreamSigns, String lucid, String lucidTechnique, String additionalNotes) {
         this.titleDream = titleDream;
         this.dream = dream;
-        this.calendar=calendar;
-        this.dreamSigns=dreamSigns;
+        this.dateOfDream = dateOfDream;
+        this.userDreamSigns=userDreamSigns;
         this.lucid=lucid;
         this.lucidTechnique=lucidTechnique;
         this.additionalNotes=additionalNotes;
@@ -42,16 +41,12 @@ public class Dream {
     public String getTitleDream() {
         return titleDream;
     }
-    public GregorianCalendar getCalendar() {
-        return calendar;
-    }
-
     public HashMap<String, Object> getTimeStampLastChanged() {
         return timeStampLastChanged;
     }
 
-    public HashMap<String, Object> getDreamSigns() {
-        return dreamSigns;
+    public HashMap<String, Object> getUserDreamSigns() {
+        return userDreamSigns;
     }
 
     public String getLucid() {
@@ -64,5 +59,9 @@ public class Dream {
 
     public String getAdditionalNotes() {
         return additionalNotes;
+    }
+
+    public long getDateOfDream() {
+        return dateOfDream;
     }
 }

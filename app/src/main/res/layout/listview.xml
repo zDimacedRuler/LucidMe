@@ -46,7 +46,7 @@
                     android:id="@+id/text_view_dayLV"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                    android:gravity="bottom"
                     android:fontFamily="sans-serif-medium"
                     android:paddingRight="5dp"
                     android:text="Day"
@@ -57,7 +57,7 @@
                     android:id="@+id/text_view_dateLV"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                    android:gravity="bottom"
                     android:fontFamily="sans-serif-medium"
                     android:paddingRight="5dp"
                     android:textColor="@color/primaryColor"
@@ -70,8 +70,27 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:src="@drawable/ic_lucid_gray_16dp"
+                    android:paddingRight="5dp"
                     android:visibility="gone"
                     tools:visibility="visible" />
+                <ImageView
+                    android:id="@+id/image_view_labelLV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom"
+                    android:src="@drawable/ic_label_primary_16dp"
+                    tools:visibility="visible"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/text_view_labelLV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="label"
+                    android:textColor="@color/primaryColor"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <TextView

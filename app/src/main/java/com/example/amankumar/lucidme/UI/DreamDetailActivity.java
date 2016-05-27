@@ -19,10 +19,11 @@ import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,10 +34,11 @@ public class DreamDetailActivity extends AppCompatActivity {
     //Display ViewGroups
     TextView dateOfDreamText, lucidTechniqueText;
     TextView dreamSignText;
-    TextView titleText, dreamText, notesText;
-    ImageView lucidImage;
+    TextView titleText, dreamText, notesText,labelText;
+    ImageView lucidImage,labelImage;
     CardView dreamSignCard;
     CardView notesCardView;
+    CardView techniqueCardView;
     //associated strings
     String lucidTechnique, lucidState, title, dream, notes;
     ArrayList<String> dreamSigns;
@@ -45,7 +47,8 @@ public class DreamDetailActivity extends AppCompatActivity {
     String listId;
     String encodedEmail;
     SharedPreferences sp;
-    Firebase dreamDetailRef;
+    FirebaseDatabase ref;
+    DatabaseReference dreamDetailRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +66,15 @@ public class DreamDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        dreamDetailRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+        dreamDetailRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+//        dreamDetailRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
         dreamDetailRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Dream dreamModel = dataSnapshot.getValue(Dream.class);
                 //date
-                gregorianCalendar = dreamModel.getCalendar();
+                long milliseconds=dreamModel.getDateOfDream();
+                gregorianCalendar.setTimeInMillis(milliseconds);
                 int monthOfYear = gregorianCalendar.get(Calendar.MONTH);
                 int dayOfMonth = gregorianCalendar.get(Calendar.DAY_OF_MONTH);
                 int dayOfWeek = gregorianCalendar.get(Calendar.DAY_OF_WEEK);
@@ -84,26 +89,31 @@ public class DreamDetailActivity extends AppCompatActivity {
                     lucidImage.setVisibility(View.VISIBLE);
                     lucidTechnique = dreamModel.getLucidTechnique();
                     if (!lucidTechnique.equals("")) {
-                        lucidTechniqueText.setVisibility(View.VISIBLE);
+                        techniqueCardView.setVisibility(View.VISIBLE);
                         lucidTechniqueText.setText(lucidTechnique);
                     }else{
-                        lucidTechniqueText.setVisibility(View.GONE);
+                        techniqueCardView.setVisibility(View.GONE);
                     }
                 } else {
                     lucidImage.setVisibility(View.GONE);
-                    lucidTechniqueText.setVisibility(View.GONE);
+                    techniqueCardView.setVisibility(View.GONE);
                 }
-                if (dataSnapshot.child("dreamSigns").exists()) {
+                if (dataSnapshot.child(Constants.CONSTANT_USERDREAMSIGNS).exists()) {
+                    labelImage.setVisibility(View.VISIBLE);
+                    labelText.setVisibility(View.VISIBLE);
                     dreamSignCard.setVisibility(View.VISIBLE);
                     dreamSignText.setText("");
                     HashMap<String, Object> obj;
-                    obj = dreamModel.getDreamSigns();
-                    dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_DREAMSIGNS);
+                    obj = dreamModel.getUserDreamSigns();
+                    dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_USERDREAMSIGNS);
+                    labelText.setText(String.valueOf(dreamSigns.size()));
                     for (String sign : dreamSigns) {
                         String text = "#" + sign + "  ";
                         dreamSignText.append(text);
                     }
                 } else {
+                    labelImage.setVisibility(View.GONE);
+                    labelText.setVisibility(View.GONE);
                     dreamSignCard.setVisibility(View.GONE);
                 }
                 title = dreamModel.getTitleDream();
@@ -116,11 +126,10 @@ public class DreamDetailActivity extends AppCompatActivity {
                     notesText.setText(notes);
                 } else
                     notesCardView.setVisibility(View.GONE);
-
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -136,9 +145,14 @@ public class DreamDetailActivity extends AppCompatActivity {
         titleText = (TextView) findViewById(R.id.DD_title_Text);
         dreamText = (TextView) findViewById(R.id.DD_dream_Text);
         notesText = (TextView) findViewById(R.id.DD_notes_Text);
+        labelImage= (ImageView) findViewById(R.id.DD_imageLabel);
+        labelText= (TextView) findViewById(R.id.DD_textLabel);
         dreamSignCard = (CardView) findViewById(R.id.DD_dreamSign_card_view);
         notesCardView = (CardView) findViewById(R.id.DD_notes_card_view);
+        techniqueCardView= (CardView) findViewById(R.id.DD_lucid_technique_card_view);
         dreamSigns = new ArrayList<>();
+        ref=FirebaseDatabase.getInstance();
+        gregorianCalendar= (GregorianCalendar) GregorianCalendar.getInstance();
     }
 
     @Override
@@ -163,7 +177,7 @@ public class DreamDetailActivity extends AppCompatActivity {
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Firebase deleteRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+                    DatabaseReference deleteRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
                     deleteRef.setValue(null);
                     finish();
                 }

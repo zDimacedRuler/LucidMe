@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -14,27 +15,41 @@ import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.UI.HomeActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class LoginActivity extends AppCompatActivity {
-    Firebase ref;
+    DatabaseReference ref;
+    FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener authStateListener;
     SharedPreferences sp;
     SharedPreferences.Editor spe;
     EditText emailEdit, passwordEdit;
     ProgressDialog mProgressDialog;
-    String email,password,encodedEmail,currentUser;
+    String email, password, encodedEmail, currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
-        ref = new Firebase(Constants.FIREBASE_URL);
+        //ref = new Firebase(Constants.FIREBASE_URL);
+        ref = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
         init();
-        currentUser=sp.getString(Constants.CURRENT_USER,null);
-        if(currentUser!=null)
-            takeUserToDreamJournalActivity();
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user!=null)
+                    takeUserToDreamJournalActivity();
+            }
+        };
     }
 
     private void init() {
@@ -64,19 +79,29 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void LoginButtonHandler(View view) {
-        email=emailEdit.getText().toString().toLowerCase();
-        password=passwordEdit.getText().toString();
-        encodedEmail= Utils.encodeEmail(email);
+        email = emailEdit.getText().toString().toLowerCase();
+        password = passwordEdit.getText().toString();
+        encodedEmail = Utils.encodeEmail(email);
         if (email.equals("")) {
             emailEdit.setError("Email cannot be empty");
             return;
         }
-        if (password.equals("")){
+        if (password.equals("")) {
             passwordEdit.setError("Field cannot be empty");
             return;
         }
         mProgressDialog.show();
-        ref.authWithPassword(email, password, new Firebase.AuthResultHandler() {
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                mProgressDialog.dismiss();
+                spe.putString(Constants.CURRENT_USER,encodedEmail).apply();
+                if(!task.isSuccessful()){
+                    showErrorToast(task.getException().getMessage());
+                }
+            }
+        });
+        /*ref.authWithPassword(email, password, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
                 mProgressDialog.dismiss();
@@ -104,7 +129,21 @@ public class LoginActivity extends AppCompatActivity {
                         showErrorToast(firebaseError.toString());
                 }
             }
-        });
+        });*/
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(authStateListener!=null){
+            mAuth.removeAuthStateListener(authStateListener);
+        }
     }
 
     private void takeUserToDreamJournalActivity() {
@@ -112,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
     }
 
     private void showErrorToast(String s) {

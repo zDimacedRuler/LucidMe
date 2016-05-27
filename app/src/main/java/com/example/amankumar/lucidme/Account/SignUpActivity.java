@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +18,19 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.amankumar.lucidme.R;
+import com.example.amankumar.lucidme.UI.HomeActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -33,7 +41,11 @@ public class SignUpActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     EditText passwordEdit,userNameEdit;
     ProgressDialog mProgressDialog;
-    Firebase ref,userRef,dreamSignRef;
+    FirebaseDatabase ref;
+    DatabaseReference userRef;
+    DatabaseReference dreamSignRef;
+    FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener authStateListener;
     SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +55,6 @@ public class SignUpActivity extends AppCompatActivity {
         try{
             Account[] accounts= AccountManager.get(this).getAccountsByType("com.google");
             for(Account account : accounts){
-                Log.e("SignUpActivity","Account:"+account.name);
                 emails.add(account.name);
             }
         }
@@ -57,7 +68,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 email=adapter.getItem(position);
-                Toast.makeText(SignUpActivity.this,email,Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -65,10 +75,21 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         });
+        authStateListener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user!=null){
+                    createUserInFireBaseHelper();
+                    login();
+                }
+            }
+        };
     }
 
     private void init() {
-        ref=new Firebase(Constants.FIREBASE_URL);
+        ref=FirebaseDatabase.getInstance();
+        mAuth=FirebaseAuth.getInstance();
         emailSpinner= (Spinner) findViewById(R.id.email_spinner);
         emails=new ArrayList<>();
         passwordEdit= (EditText) findViewById(R.id.password_SignUpEditText);
@@ -80,6 +101,19 @@ public class SignUpActivity extends AppCompatActivity {
         sp= PreferenceManager.getDefaultSharedPreferences(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(authStateListener!=null)
+            mAuth.removeAuthStateListener(authStateListener);
+    }
+
     public void SignUpUserHandler(View view) {
         password= String.valueOf(passwordEdit.getText());
         userName= String.valueOf(userNameEdit.getText());
@@ -88,7 +122,19 @@ public class SignUpActivity extends AppCompatActivity {
         if(!validPassword || !validUserName)
             return;
         mProgressDialog.show();
-        ref.createUser(email, password, new Firebase.ResultHandler() {
+        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                mProgressDialog.dismiss();
+                SharedPreferences.Editor spe=sp.edit();
+                encodedEmail = Utils.encodeEmail(email);
+                spe.putString(Constants.CURRENT_USER,encodedEmail).apply();
+                if(!task.isSuccessful()){
+                    showErrorToast(task.getException().getMessage());
+                }
+            }
+        });
+       /* ref.createUser(email, password, new Firebase.ResultHandler() {
             @Override
             public void onSuccess() {
                 mProgressDialog.dismiss();
@@ -103,11 +149,11 @@ public class SignUpActivity extends AppCompatActivity {
                 mProgressDialog.dismiss();
                 showErrorToast(firebaseError.getMessage());
             }
-        });
+        });*/
     }
 
     private void login() {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
@@ -115,7 +161,21 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void createUserInFireBaseHelper() {
         encodedEmail= Utils.encodeEmail(email);
-        userRef=new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail);
+        userRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail);
+        dreamSignRef=ref.getReference() .child(Constants.LOCATION_DREAMS_SIGNS);
+        userRef.child(Constants.LOCATION_USERNAME).setValue(userName);
+        dreamSignRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DatabaseReference userDreamRef=FirebaseDatabase.getInstance().getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
+                userDreamRef.setValue(dataSnapshot.getValue());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+      /*  userRef=new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail);
         userRef.child(Constants.LOCATION_USERNAME).setValue(userName);
         dreamSignRef=new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATION_DREAMS_SIGNS);
         dreamSignRef.addValueEventListener(new ValueEventListener() {
@@ -129,7 +189,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
-        });
+        });*/
     }
 
     private void showErrorToast(String message) {

@@ -2,9 +2,17 @@ package com.example.amankumar.lucidme.UI;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -26,21 +34,33 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.amankumar.lucidme.Account.LoginActivity;
 import com.example.amankumar.lucidme.R;
+import com.example.amankumar.lucidme.UI.Chat.ChatFragment;
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.firebase.client.AuthData;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     private static final int ADD_DREAM = 1;
     private static final int RESULT_DONE = 1;
+    private static final int SELECT_PICTURE = 100;
+    private static final int height = 300;
+    private static final int width = 300;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
@@ -50,8 +70,12 @@ public class HomeActivity extends AppCompatActivity {
     ImageView imageView;
     TextView userNameText;
     SharedPreferences sp;
-    Firebase ref, userRef;
-    Firebase.AuthStateListener mAuthStateListener;
+    FirebaseDatabase ref;
+    DatabaseReference userRef;
+    FirebaseAuth mAuth;
+    FirebaseStorage firebaseStorage;
+    StorageReference storageReference, profileRef;
+    FirebaseAuth.AuthStateListener mAuthStateListener;
     String currentUser;
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton floatingActionButton;
@@ -99,25 +123,40 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        currentUser = sp.getString(Constants.CURRENT_USER, "");
+        ref = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageReference = firebaseStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
         headerView = navigationView.getHeaderView(0);
         imageView = (ImageView) headerView.findViewById(R.id.nav_avatar);
         userNameText = (TextView) headerView.findViewById(R.id.nav_username);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
-        ref = new Firebase(Constants.FIREBASE_URL);
-        sp = PreferenceManager.getDefaultSharedPreferences(this);
-        currentUser = sp.getString(Constants.CURRENT_USER, "");
-        mAuthStateListener = new Firebase.AuthStateListener() {
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onAuthStateChanged(AuthData authData) {
-                if (authData == null) {
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
                     SharedPreferences.Editor spe = sp.edit();
                     spe.putString(Constants.CURRENT_USER, null).apply();
                     takeUserToLoginScreenOnUnAuth();
                 }
             }
         };
-        ref.addAuthStateListener(mAuthStateListener);
-        userRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //code to pick image
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Select Picture"), SELECT_PICTURE);
+            }
+        });
+        mAuth.addAuthStateListener(mAuthStateListener);
+        userRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -125,7 +164,7 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -216,8 +255,11 @@ public class HomeActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.action_logout:
-                ref.unauth();
+                FirebaseAuth.getInstance().signOut();
                 break;
+            case R.id.action_test:
+                Intent intent = new Intent(this, TestActivity.class);
+                startActivity(intent);
         }
         return true;
     }
@@ -248,6 +290,55 @@ public class HomeActivity extends AppCompatActivity {
                 Snackbar.make(floatingActionButton, "Unable to store empty Dream ", Snackbar.LENGTH_SHORT).show();
             }
         }
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                //code to put image in firebase
+                Uri selectedImageUri = data.getData();
+                profileRef = storageReference.child(currentUser).child(Constants.CONSTANT_PROFILE_PIC);
+                if (Build.VERSION.SDK_INT < 19) {
+                    String selectedImagePath = getPath(selectedImageUri);
+                    Glide.with(HomeActivity.this).load(selectedImagePath).into(imageView);
+                } else {
+                    ParcelFileDescriptor parcelFileDescriptor;
+                    try {
+                        parcelFileDescriptor = getContentResolver().openFileDescriptor(selectedImageUri, "r");
+                        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+                        bmpFactoryOptions.inJustDecodeBounds = true;
+                        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmpFactoryOptions);
+                        int heightRatio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) height);
+                        int widthRatio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) width);
+                        if (heightRatio > 1 || widthRatio > 1) {
+                            if (heightRatio > widthRatio) {
+                                bmpFactoryOptions.inSampleSize = heightRatio;
+                            } else {
+                                bmpFactoryOptions.inSampleSize = widthRatio;
+                            }
+                        }
+                        bmpFactoryOptions.inJustDecodeBounds = false;
+                        image = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmpFactoryOptions);
+                        imageView.setImageBitmap(image);
+                        parcelFileDescriptor.close();
+                        /*UploadTask uploadTask = profileRef.putFile(imageUri);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("HomeActivity:", "Upload failed");
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Log.d("HomeActivity:", "Upload successful");
+                            }
+                        });*/
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -256,7 +347,6 @@ public class HomeActivity extends AppCompatActivity {
             super.onBackPressed();
             return;
         }
-
         this.doubleBackToExitPressedOnce = true;
 //        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
         Snackbar.make(floatingActionButton, "Please click BACK again to exit", Snackbar.LENGTH_SHORT).show();
@@ -267,5 +357,20 @@ public class HomeActivity extends AppCompatActivity {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+    }
+
+    public String getPath(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        return uri.getPath();
     }
 }

@@ -4,7 +4,6 @@ package com.example.amankumar.lucidme.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -22,24 +21,28 @@ import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
-import com.firebase.ui.FirebaseRecyclerViewAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 public class JournalFragment extends Fragment {
     String currentUser;
     SharedPreferences sp;
-    Firebase dreamRef, userDreamRef;
+    FirebaseDatabase ref;
+    DatabaseReference dreamRef, userDreamRef;
     RecyclerView dreamRecyclerView;
     Query query;
     RecyclerViewAdapter recyclerViewAdapter;
     CardView noDreamCardView;
-    Typeface typeface;
     public JournalFragment() {
         // Required empty public constructor
     }
@@ -61,14 +64,15 @@ public class JournalFragment extends Fragment {
         currentUser = sp.getString(Constants.CURRENT_USER, "");
         dreamRecyclerView = (RecyclerView) view.findViewById(R.id.dreamRecyclerView);
         noDreamCardView = (CardView) view.findViewById(R.id.DF_no_dream_card_view);
-        dreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
+        ref=FirebaseDatabase.getInstance();
+        dreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
         dreamRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(Constants.LOCATION_DREAMS).exists()) {
                     noDreamCardView.setVisibility(View.GONE);
-                    userDreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_DREAMS);
-                    query = userDreamRef.orderByChild("calendar");
+                    userDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
+                    query = userDreamRef.orderByChild("dateOfDream");
                     recyclerViewAdapter = new RecyclerViewAdapter(Dream.class, R.layout.listview, RecyclerViewHolder.class, query);
                     dreamRecyclerView.setLayoutManager(new NpaGridLayoutManager(getActivity()));
 //                    dreamRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
@@ -79,7 +83,7 @@ public class JournalFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -87,18 +91,11 @@ public class JournalFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         getActivity().getMenuInflater().inflate(R.menu.menu_home, menu);
     }
-
-    public class RecyclerViewAdapter extends FirebaseRecyclerViewAdapter<Dream, RecyclerViewHolder> {
+    public class RecyclerViewAdapter extends FirebaseRecyclerAdapter<Dream,RecyclerViewHolder>{
 
         public RecyclerViewAdapter(Class<Dream> modelClass, int modelLayout, Class<RecyclerViewHolder> viewHolderClass, Query ref) {
             super(modelClass, modelLayout, viewHolderClass, ref);
@@ -106,14 +103,16 @@ public class JournalFragment extends Fragment {
 
         @Override
         protected void populateViewHolder(RecyclerViewHolder viewHolder, Dream model, int position) {
-            super.populateViewHolder(viewHolder, model, position);
             viewHolder.titleText.setText(model.getTitleDream());
             viewHolder.dreamText.setText(model.getDream());
-            Calendar calendar = model.getCalendar();
+            long milliseconds=model.getDateOfDream();
+            GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+            calendar.setTimeInMillis(milliseconds);
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             int year=calendar.get(Calendar.YEAR);
             int month=calendar.get(Calendar.MONTH);
+            month+=1;
             String dateText=dayOfMonth+"/"+month+"/"+year;
             viewHolder.dayText.setText(Utils.getDay(dayOfWeek));
             viewHolder.dateText.setText(dateText);
@@ -122,6 +121,17 @@ public class JournalFragment extends Fragment {
                 viewHolder.lucidImage.setVisibility(View.VISIBLE);
             else
                 viewHolder.lucidImage.setVisibility(View.GONE);
+            HashMap<String, Object> obj=model.getUserDreamSigns();
+            if(obj==null){
+                viewHolder.labelImage.setVisibility(View.GONE);
+                viewHolder.labelText.setVisibility(View.GONE);
+            }else{
+                viewHolder.labelImage.setVisibility(View.VISIBLE);
+                viewHolder.labelText.setVisibility(View.VISIBLE);
+                ArrayList<String> dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_USERDREAMSIGNS);
+                viewHolder.labelText.setText(String.valueOf(dreamSigns.size()));
+            }
+
         }
 
         @Override
@@ -134,7 +144,6 @@ public class JournalFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), DreamDetailActivity.class);
                     intent.putExtra("listId", listId);
                     startActivity(intent);
-
                 }
             });
         }

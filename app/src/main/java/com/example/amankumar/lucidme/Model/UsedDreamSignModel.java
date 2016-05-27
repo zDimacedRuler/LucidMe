@@ -6,16 +6,16 @@ import java.util.ArrayList;
  * Created by AmanKumar on 5/17/2016.
  */
 public class UsedDreamSignModel {
-   ArrayList<Object> DREAMSIGNS;
+   ArrayList<String> userDreamSigns;
 
     public UsedDreamSignModel() {
     }
 
-    public UsedDreamSignModel(ArrayList<Object> DREAMSIGNS) {
-        this.DREAMSIGNS = DREAMSIGNS;
+    public UsedDreamSignModel(ArrayList<String> DREAMSIGNS) {
+        this.userDreamSigns = DREAMSIGNS;
     }
 
-    public ArrayList<Object> getDREAMSIGNS() {
-        return DREAMSIGNS;
+    public ArrayList<String > getDREAMSIGNS() {
+        return userDreamSigns;
     }
 }

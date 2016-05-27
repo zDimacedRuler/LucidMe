@@ -16,10 +16,11 @@ import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.Model.UsedDreamSignModel;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -27,7 +28,8 @@ public class SelectedDreamSignActivity extends AppCompatActivity {
     Toolbar toolbar;
     SharedPreferences sp;
     String currentUser, listId;
-    Firebase selectedDreamSignRef, dreamRef;
+    FirebaseDatabase ref;
+    DatabaseReference selectedDreamSignRef, dreamRef;
     ListView selectedDreamSignListView;
     SelectedDreamSignAdapter dreamSignAdapter;
     ArrayList<Dream> selectedDreams;
@@ -45,6 +47,7 @@ public class SelectedDreamSignActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         currentUser = sp.getString(Constants.CURRENT_USER, "");
+        ref = FirebaseDatabase.getInstance();
         selectedDreamSignListView = (ListView) findViewById(R.id.SDS_list_view);
         noDreamCardView = (CardView) findViewById(R.id.SDS_no_dream_card_view);
         listId = getIntent().getStringExtra("listId");
@@ -69,42 +72,47 @@ public class SelectedDreamSignActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         selectedDreams = new ArrayList<>();
-        dreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_DREAMS);
-        selectedDreamSignRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS).child(listId);
+        dreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
+        selectedDreamSignRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS).child(listId);
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UsedDreamSignModel model = dataSnapshot.getValue(UsedDreamSignModel.class);
-                final ArrayList<Object> list = model.getDREAMSIGNS();
-                getSupportActionBar().setTitle(list.get(0).toString());
+                final ArrayList<String> list = model.getDREAMSIGNS();
+                getSupportActionBar().setTitle(list.get(0));
                 list.remove(0);
                 dreamRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        ArrayList<String> presentListId = new ArrayList<>();
                         for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            if (list.contains(child.getKey())) {
-                                Dream dream = child.getValue(Dream.class);
-                                selectedDreams.add(dream);
+                            for (int i = 0; i < list.size(); i++) {
+                                if (list.get(i).equals(child.getKey())) {
+                                    Dream dream = child.getValue(Dream.class);
+                                    selectedDreams.add(dream);
+                                    presentListId.add(list.get(i));
+                                }
                             }
                         }
+
                         if (selectedDreams.size() == 0) {
                             noDreamCardView.setVisibility(View.VISIBLE);
                         } else {
                             noDreamCardView.setVisibility(View.GONE);
                         }
-                        dreamSignAdapter = new SelectedDreamSignAdapter(SelectedDreamSignActivity.this, R.layout.listview, selectedDreams, list);
+                        dreamSignAdapter = new SelectedDreamSignAdapter(SelectedDreamSignActivity.this, R.layout.listview, selectedDreams, presentListId);
                         selectedDreamSignListView.setAdapter(dreamSignAdapter);
                     }
 
                     @Override
-                    public void onCancelled(FirebaseError firebaseError) {
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         };

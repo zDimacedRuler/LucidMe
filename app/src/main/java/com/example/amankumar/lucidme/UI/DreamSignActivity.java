@@ -17,11 +17,12 @@ import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.Model.UsedDreamSignModel;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.firebase.ui.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,8 @@ import java.util.Map;
 public class DreamSignActivity extends AppCompatActivity {
     Toolbar toolbar;
     SharedPreferences sp;
-    Firebase userRef, dreamRef, userDreamRef, usedDreamSignRef,checkRef;
+    FirebaseDatabase ref;
+    DatabaseReference userRef, dreamRef, userDreamRef, usedDreamSignRef, checkRef;
     String currentUser;
     ValueEventListener valueEventListener;
     ListView dreamSignListView;
@@ -51,20 +53,19 @@ public class DreamSignActivity extends AppCompatActivity {
         ab.setTitle("DreamSigns");
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         currentUser = sp.getString(Constants.CURRENT_USER, "");
-        userRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
+        ref = FirebaseDatabase.getInstance();
+        userRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
+//        userRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
         init();
     }
 
     private void init() {
         dreamSignListView = (ListView) findViewById(R.id.DS_list_view);
-        noDreamSignCard= (CardView) findViewById(R.id.DS_no_dream_card_view);
-        dreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
-        checkRef=new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        noDreamSignCard = (CardView) findViewById(R.id.DS_no_dream_card_view);
+        dreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
+        checkRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
+        /*dreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);
+        checkRef=new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser);*/
     }
 
     @Override
@@ -74,17 +75,17 @@ public class DreamSignActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(Constants.LOCATION_DREAMS).exists()) {
-                    userDreamRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_DREAMS);
+                    userDreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
                     map = new HashMap<>();
                     userDreamRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                if (child.child(Constants.CONSTANT_DREAMSIGNS).exists()) {
+                                if (child.child(Constants.CONSTANT_USERDREAMSIGNS).exists()) {
                                     Dream dreamModel = child.getValue(Dream.class);
                                     HashMap<String, Object> obj;
-                                    obj = dreamModel.getDreamSigns();
-                                    dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_DREAMSIGNS);
+                                    obj = dreamModel.getUserDreamSigns();
+                                    dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_USERDREAMSIGNS);
                                     for (String s : dreamSigns) {
                                         HashMap<String, ArrayList<String>> listMap = map.get(s);
                                         if (listMap == null) {
@@ -92,46 +93,47 @@ public class DreamSignActivity extends AppCompatActivity {
                                             ArrayList<String> list = new ArrayList<String>();
                                             list.add(s);
                                             list.add(child.getKey());
-                                            listMap.put(Constants.LOCATION_DREAMS_SIGNS, list);
+                                            listMap.put(Constants.CONSTANT_USERDREAMSIGNS, list);
                                         } else {
-                                            ArrayList<String> list = listMap.get(Constants.LOCATION_DREAMS_SIGNS);
+                                            ArrayList<String> list = listMap.get(Constants.CONSTANT_USERDREAMSIGNS);
                                             list.add(child.getKey());
-                                            listMap.put(Constants.LOCATION_DREAMS_SIGNS, list);
+                                            listMap.put(Constants.CONSTANT_USERDREAMSIGNS, list);
                                         }
                                         map.put(s, listMap);
                                     }
                                 }
                             }
-                            usedDreamSignRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS);
+                            usedDreamSignRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS);
                             usedDreamSignRef.setValue(map);
                         }
 
                         @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-                        }
-                    });
-                    checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.child(Constants.LOCATION_USED_DREAMS_SIGNS).exists()){
-                                noDreamSignCard.setVisibility(View.GONE);
-                            }else{
-                                noDreamSignCard.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
+                        public void onCancelled(DatabaseError databaseError) {
 
                         }
                     });
-                    usedDreamSignRef = new Firebase(Constants.FIREBASE_USERS_URL).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS);
-                    usedDreamSignModelListAdapter = new FirebaseListAdapter<UsedDreamSignModel>(DreamSignActivity.this, UsedDreamSignModel.class, R.layout.dream_sign_list_view, usedDreamSignRef) {
+                    checkRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(Constants.LOCATION_USED_DREAMS_SIGNS).exists()) {
+                                noDreamSignCard.setVisibility(View.GONE);
+                            } else {
+                                noDreamSignCard.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    usedDreamSignRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_USED_DREAMS_SIGNS);
+                    usedDreamSignModelListAdapter=new FirebaseListAdapter<UsedDreamSignModel>(DreamSignActivity.this, UsedDreamSignModel.class, R.layout.dream_sign_list_view, usedDreamSignRef) {
                         @Override
                         protected void populateView(View v, UsedDreamSignModel model, int position) {
-                            super.populateView(v, model, position);
-                            ArrayList<Object> list = model.getDREAMSIGNS();
+                            ArrayList<String> list = model.getDREAMSIGNS();
                             TextView dreamSignView = (TextView) v.findViewById(R.id.DS_LV_sign_text);
-                            dreamSignView.setText(list.get(0).toString());
+                            dreamSignView.setText(list.get(0));
                             TextView noOfDreams = (TextView) v.findViewById(R.id.DS_LV_no_text);
                             String noOfDreamsText = "Dreams:" + (list.size() - 1);
                             noOfDreams.setText(noOfDreamsText);
@@ -145,7 +147,6 @@ public class DreamSignActivity extends AppCompatActivity {
                             Intent intent = new Intent(DreamSignActivity.this, SelectedDreamSignActivity.class);
                             intent.putExtra("listId", listId);
                             startActivity(intent);
-
                         }
                     });
                 }
@@ -155,12 +156,11 @@ public class DreamSignActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         };
         dreamRef.addListenerForSingleValueEvent(valueEventListener);
-
     }
 
     @Override

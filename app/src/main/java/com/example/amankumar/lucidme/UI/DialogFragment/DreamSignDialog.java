@@ -22,27 +22,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.amankumar.lucidme.Model.DreamSignModel;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
-import com.firebase.ui.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 public class DreamSignDialog extends DialogFragment {
     AutoCompleteTextView dreamSignEdit;
     ListView dreamList;
-    Firebase ref, userRef;
-    FirebaseListAdapter<DreamSignModel> firebaseListAdapter;
+    FirebaseDatabase ref;
+    DatabaseReference userRef,dreamSignRef;
+    FirebaseListAdapter<String> firebaseListAdapter;
     ArrayList<String> selectedItems;
     SharedPreferences sp;
     String encodedEmail;
-    ArrayList<String> dreamSignList;
     ArrayAdapter<String> stringArrayAdapter;
     Query query;
 
@@ -53,7 +53,7 @@ public class DreamSignDialog extends DialogFragment {
     public static DreamSignDialog newInstance(ArrayList<String> dreamSigns) {
         DreamSignDialog fragment = new DreamSignDialog();
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList("dreamSign", dreamSigns);
+        bundle.putStringArrayList("userSelectedDreamSigns", dreamSigns);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -62,17 +62,16 @@ public class DreamSignDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         selectedItems = new ArrayList<>();
-        assert savedInstanceState != null;
-        selectedItems = getArguments().getStringArrayList("dreamSign");
+        selectedItems = getArguments().getStringArrayList("userSelectedDreamSigns");
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        ref=FirebaseDatabase.getInstance();
         sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         encodedEmail = sp.getString(Constants.CURRENT_USER, "");
-        dreamSignList = new ArrayList<>();
-        userRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail);
+        userRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View rootView = inflater.inflate(R.layout.dialog_dream_signs, null);
@@ -81,37 +80,18 @@ public class DreamSignDialog extends DialogFragment {
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(Constants.LOCATION_DREAMS_SIGNS).exists()) {
-                    ref = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
-                    query = ref.orderByValue();
-                    dreamSignList.clear();
-                    ref.addValueEventListener(new ValueEventListener() {
+                if(dataSnapshot.child(Constants.LOCATION_DREAMS_SIGNS).exists()){
+                    dreamSignRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
+                    query=dreamSignRef.orderByValue();
+                    firebaseListAdapter=new FirebaseListAdapter<String>(getActivity(),String.class,R.layout.dialog_list_view,dreamSignRef) {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                dreamSignList.add(child.getValue().toString());
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-
-                        }
-                    });
-                    /*stringArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, dreamSignList);
-                    dreamSignEdit.setAdapter(stringArrayAdapter);*/
-                    firebaseListAdapter = new FirebaseListAdapter<DreamSignModel>(getActivity(), DreamSignModel.class, R.layout.dialog_list_view, query) {
-                        @Override
-                        protected void populateView(View v, DreamSignModel model, int position) {
-                            super.populateView(v, model, position);
+                        protected void populateView(View v, String model, int position) {
                             TextView dreamSignText = (TextView) v.findViewById(R.id.dialog_list_text);
-                            dreamSignText.setText(model.getDreamSign());
-                            if (selectedItems.contains(model.getDreamSign())) {
+                            dreamSignText.setText(model);
+                            if(selectedItems.contains(model))
                                 dreamSignText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_box_gray, 0);
-                            } else {
+                            else
                                 dreamSignText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_outline_gray, 0);
-
-                            }
                         }
                     };
                     dreamList.setAdapter(firebaseListAdapter);
@@ -119,8 +99,7 @@ public class DreamSignDialog extends DialogFragment {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             TextView dreamSignText = (TextView) view.findViewById(R.id.dialog_list_text);
-                            DreamSignModel dreamSignModel = firebaseListAdapter.getItem(position);
-                            String sign = dreamSignModel.getDreamSign();
+                            String sign = firebaseListAdapter.getItem(position);
                             if (selectedItems.contains(sign)) {
                                 dreamSignText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_outline_gray, 0);
                                 selectedItems.remove(sign);
@@ -139,7 +118,8 @@ public class DreamSignDialog extends DialogFragment {
                             deleteBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    ref.child(listId).setValue(null);
+//                                    ref.child(listId).setValue(null);
+                                    dreamSignRef.child(listId).setValue(null);
                                 }
                             });
                             deleteBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -153,12 +133,10 @@ public class DreamSignDialog extends DialogFragment {
                             return true;
                         }
                     });
-
                 }
             }
-
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });

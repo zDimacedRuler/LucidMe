@@ -1,4 +1,4 @@
-package com.example.amankumar.lucidme.UI;
+package com.example.amankumar.lucidme.UI.Chat;
 
 
 import android.os.Bundle;

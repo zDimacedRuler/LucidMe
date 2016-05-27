@@ -11,8 +11,8 @@ import com.example.amankumar.lucidme.R;
  * Created by AmanKumar on 4/30/2016.
  */
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
-    TextView titleText,dreamText,dayText,dateText;
-    ImageView lucidImage;
+    TextView titleText,dreamText,dayText,dateText,labelText;
+    ImageView lucidImage,labelImage;
     View view;
     public RecyclerViewHolder(View itemView) {
         super(itemView);
@@ -22,5 +22,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         dayText= (TextView) itemView.findViewById(R.id.text_view_dayLV);
         dateText= (TextView) itemView.findViewById(R.id.text_view_dateLV);
         lucidImage= (ImageView) itemView.findViewById(R.id.image_view_lucidLV);
+        labelText= (TextView) itemView.findViewById(R.id.text_view_labelLV);
+        labelImage= (ImageView) itemView.findViewById(R.id.image_view_labelLV);
     }
 }

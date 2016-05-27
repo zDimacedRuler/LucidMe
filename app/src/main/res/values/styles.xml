@@ -8,6 +8,9 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryColorDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/primaryColor</item>
+        <item name="actionMenuTextColor">@color/colorWhite</item>
     </style>
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>

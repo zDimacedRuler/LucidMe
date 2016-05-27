@@ -32,10 +32,11 @@ import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.UI.DialogFragment.DreamSignDialog;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,12 +54,13 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
     //associated String
     String lucidTechnique, additionalNotes;
     String title, dream, encodedEmail, lucidState;
-    Firebase ref, dreamDetailRef;
+    long milliSeconds;
+    FirebaseDatabase ref;
+    DatabaseReference dreamDetailRef,addDreamRef;
     SharedPreferences sp;
     ArrayList<String> dreamSigns;
     CardView tagCardView;
     String caller, listId;
-    Locale locale;
     static GregorianCalendar showCalendar;
     static GregorianCalendar sendCalendar;
     static TextView datePickerButton;
@@ -102,12 +104,11 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         tagText = (TextView) findViewById(R.id.Dream_tagTextView);
         tagCardView = (CardView) findViewById(R.id.dream_tag_card_view);
         lucidState = "False";
-        ref = new Firebase(Constants.FIREBASE_USERS_URL);
+        ref =FirebaseDatabase.getInstance();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         encodedEmail = sp.getString(Constants.CURRENT_USER, null);
-        locale=getResources().getConfiguration().locale;
-        showCalendar = (GregorianCalendar) GregorianCalendar.getInstance(locale);
-        sendCalendar = (GregorianCalendar) GregorianCalendar.getInstance(locale);
+        showCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
+        sendCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
         datePickerButton = (TextView) findViewById(R.id.DatePickerButton);
         caller = "";
         listId = "";
@@ -115,14 +116,15 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         caller = getIntent().getStringExtra("caller");
         if (caller!=null && caller.equals("DreamDetail")) {
             listId = getIntent().getStringExtra("listId");
-            dreamDetailRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+            dreamDetailRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
             dreamDetailRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Dream dreamModel = dataSnapshot.getValue(Dream.class);
                     //date
-                    sendCalendar = dreamModel.getCalendar();
-                    showCalendar = dreamModel.getCalendar();
+                    milliSeconds=dreamModel.getDateOfDream();
+                    sendCalendar.setTimeInMillis(milliSeconds);
+                    showCalendar.setTimeInMillis(milliSeconds);
                     showDate();
                     //lucid checkBox
                     lucidState = dreamModel.getLucid();
@@ -133,11 +135,11 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
                         lucidTechniqueEdit.setText(lucidTechnique);
 
                     }
-                    if (dataSnapshot.child("dreamSigns").exists()) {
+                    if (dataSnapshot.child(Constants.CONSTANT_USERDREAMSIGNS).exists()) {
                         tagCardView.setVisibility(View.VISIBLE);
                         HashMap<String, Object> obj;
-                        obj = dreamModel.getDreamSigns();
-                        dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_DREAMSIGNS);
+                        obj = dreamModel.getUserDreamSigns();
+                        dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_USERDREAMSIGNS);
                         for (String sign : dreamSigns) {
                             String text = "#" + sign + "  ";
                             tagText.append(text);
@@ -149,11 +151,10 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
                     dreamEdit.setText(dream);
                     additionalNotes = dreamModel.getAdditionalNotes();
                     addNotesEdit.setText(additionalNotes);
-
                 }
 
                 @Override
-                public void onCancelled(FirebaseError firebaseError) {
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
             });
@@ -219,28 +220,36 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
             lucidTechnique = "";
         additionalNotes = addNotesEdit.getText().toString();
         HashMap<String, Object> obj = new HashMap<>();
-        obj.put(Constants.CONSTANT_DREAMSIGNS, dreamSigns);
+        obj.put(Constants.CONSTANT_USERDREAMSIGNS, dreamSigns);
         if (title.equals("")) {
             if (dream.length() > 50)
                 stringBuilder.append(dream.substring(0, 48));
             else
                 stringBuilder.append(dream);
         }
-        Dream dreamEntry = new Dream(stringBuilder.toString(), dream, sendCalendar, obj, lucidState, lucidTechnique, additionalNotes);
+        milliSeconds=sendCalendar.getTimeInMillis();
+        Dream dreamEntry = new Dream(stringBuilder.toString(), dream, milliSeconds, obj, lucidState, lucidTechnique, additionalNotes);
         if (dream.equals("")) {
             setResult(2);
             finish();
         } else {
             if (caller!=null && caller.equals("Home")) {
-                Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).push();
+                addDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS);
+                DatabaseReference key=addDreamRef.push();
                 key.setValue(dreamEntry);
                 setResult(RESULT_DONE);
                 finish();
-            } else {
-                Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+               /* Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).push();
                 key.setValue(dreamEntry);
+                setResult(RESULT_DONE);
+                finish();*/
+            } else {
+                addDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+                addDreamRef.setValue(dreamEntry);
                 finish();
-                overridePendingTransition(0, 0);
+                /*Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+                key.setValue(dreamEntry);
+                finish();*/
             }
         }
     }
@@ -284,7 +293,7 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            sendCalendar = new GregorianCalendar(year, monthOfYear, dayOfMonth + 1);
+            sendCalendar = new GregorianCalendar(year, monthOfYear, dayOfMonth);
             showCalendar = new GregorianCalendar(year, monthOfYear, dayOfMonth);
             int dayOfWeek = showCalendar.get(Calendar.DAY_OF_WEEK);
             String month = Utils.getMonth(monthOfYear);
