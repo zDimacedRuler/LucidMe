@@ -34,10 +34,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="90"
+                    android:drawableLeft="@drawable/ic_time_accent"
                     android:drawablePadding="5dp"
                     android:gravity="bottom"
                     android:padding="14dp"
-                    tools:text="Date"
+                    android:text="Date"
                     android:textStyle="bold"
                     android:textColor="@color/colorAccent"
                     android:textSize="18sp" />

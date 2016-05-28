@@ -8,10 +8,12 @@ public class Constants {
     public static final String LOCATION_USERS="USERS";
     public static final String LOCATION_DREAMS="DREAMS";
     public static final String LOCATION_DREAMS_SIGNS="DREAMSIGNS";
+    public static final String LOCATION_USER_DETAILS="USERDETAILS";
     public static final String LOCATION_USED_DREAMS_SIGNS="USED_DREAMSIGNS";
     public static final String LOCATION_USERNAME="UserName";
     public static final String SIGNUP_EMAIL="signUp_email";
     public static final String CURRENT_USER="currentUser";
+    public static final String CURRENT_USER_NAME ="currentUserName" ;
     public static final String DREAM_TITLE_DREAM="titleDream";
     public static final String CONSTANT_TIMESTAMP="timestamp";
     public static final String CONSTANT_USERDREAMSIGNS ="userDreamSigns";
@@ -27,5 +29,10 @@ public class Constants {
     public static final String WAKE_MINUTE = "wake.minute";
     public static final String DISABLE_ALL_STATE="DISABLE_ALL_STATE";
     public static final String WAKE_UP_JOURNAL_STATE="WAKE_UP_JOURNAL_STATE";
+    //chat
+    public static final String LOCATION_USER_CHATS="USER_CHATS";
+    public static final String LOCATION_CHATS="CHATS";
+    public static final String CONSTANT_TO="_TO_";
+    public static final String CONSTANT_AND="_AND_";
 
 }

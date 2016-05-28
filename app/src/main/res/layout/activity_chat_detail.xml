@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context="com.example.amankumar.lucidme.UI.Chat.ChatDetailActivity">
+
+    <include
+        android:id="@+id/Cd_appBar"
+        layout="@layout/appbar" />
+
+    <ListView
+        android:id="@+id/CD_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Cd_appBar"
+        android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll"
+        android:layout_above="@+id/CD_message_linear"/>
+
+    <LinearLayout
+        android:id="@+id/CD_message_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <EditText
+            android:id="@+id/CD_message_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="90"
+            android:background="@color/colorWhite"
+            android:hint="Enter Message"
+            android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
+            android:maxLines="4"
+            android:padding="14dp"
+            tools:text="kfjhdsjkfjk"
+            android:textSize="16dp" />
+
+        <ImageButton
+            android:id="@+id/CD_message_send_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:layout_weight="10"
+            android:background="@color/primaryColor"
+            android:onClick="sendMessageHandler"
+            android:src="@drawable/ic_send_white_24dp" />
+    </LinearLayout>
+</RelativeLayout>

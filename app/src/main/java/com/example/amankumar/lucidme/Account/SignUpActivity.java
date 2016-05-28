@@ -42,7 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText passwordEdit,userNameEdit;
     ProgressDialog mProgressDialog;
     FirebaseDatabase ref;
-    DatabaseReference userRef;
+    DatabaseReference userRef,userDetailRef;
     DatabaseReference dreamSignRef;
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener authStateListener;
@@ -134,22 +134,6 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
-       /* ref.createUser(email, password, new Firebase.ResultHandler() {
-            @Override
-            public void onSuccess() {
-                mProgressDialog.dismiss();
-                createUserInFireBaseHelper();
-                SharedPreferences.Editor spe=sp.edit();
-                spe.putString(Constants.SIGNUP_EMAIL,email).apply();
-                login();
-            }
-
-            @Override
-            public void onError(FirebaseError firebaseError) {
-                mProgressDialog.dismiss();
-                showErrorToast(firebaseError.getMessage());
-            }
-        });*/
     }
 
     private void login() {
@@ -162,8 +146,10 @@ public class SignUpActivity extends AppCompatActivity {
     private void createUserInFireBaseHelper() {
         encodedEmail= Utils.encodeEmail(email);
         userRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail);
-        dreamSignRef=ref.getReference() .child(Constants.LOCATION_DREAMS_SIGNS);
+        userDetailRef=ref.getReference().child(Constants.LOCATION_USER_DETAILS);
+        dreamSignRef=ref.getReference().child(Constants.LOCATION_DREAMS_SIGNS);
         userRef.child(Constants.LOCATION_USERNAME).setValue(userName);
+        userDetailRef.child(encodedEmail).setValue(userName);
         dreamSignRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -175,21 +161,6 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         });
-      /*  userRef=new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail);
-        userRef.child(Constants.LOCATION_USERNAME).setValue(userName);
-        dreamSignRef=new Firebase(Constants.FIREBASE_URL).child(Constants.LOCATION_DREAMS_SIGNS);
-        dreamSignRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Firebase userDreamRef=new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
-                userDreamRef.setValue(dataSnapshot.getValue());
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });*/
     }
 
     private void showErrorToast(String message) {

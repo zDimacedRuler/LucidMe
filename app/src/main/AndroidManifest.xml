@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:name=".Application.LucidMeApp"
         android:allowBackup="true"
@@ -62,7 +63,12 @@
             android:name=".UI.SelectedDreamSignActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".UI.DreamSignActivity" />
-        <activity android:name=".UI.TestActivity"></activity>
+        <activity android:name=".UI.TestActivity" />
+        <activity
+            android:name=".UI.Chat.FindChatActivity"
+            android:parentActivityName=".UI.HomeActivity" />
+        <activity android:name=".UI.Chat.ChatDetailActivity"
+            android:parentActivityName=".UI.HomeActivity"/>
     </application>
 
 </manifest>

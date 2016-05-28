@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.amankumar.lucidme.UI.Chat.FindChatActivity">
+
+    <include
+        android:id="@+id/FC_appBar"
+        layout="@layout/appbar" />
+
+    <LinearLayout
+        android:id="@+id/FC_find_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/FC_appBar"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:background="@color/colorWhite"
+        android:weightSum="100">
+
+        <EditText
+            android:id="@+id/FC_find_user_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="90"
+            android:background="@color/colorWhite"
+            android:hint="Find friend by email id"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:padding="14dp"
+            android:textSize="16dp" />
+
+        <ImageView
+            android:id="@+id/FC_find_user_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="10"
+            android:background="@color/colorWhite"
+            android:src="@drawable/ic_search_gray_24dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/FC_result_linear"
+        android:layout_below="@+id/FC_find_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:weightSum="100"
+        android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/FC_user_profile"
+            app:civ_border_color="@color/colorGrey"
+            app:civ_border_width="0dp"
+            android:layout_weight="10"
+            android:layout_width="50dp"
+            android:layout_gravity="center"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_dummy_profile_gray" />
+        <TextView
+            android:id="@+id/FC_result_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="90"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            tools:text="Aman Kumar"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/FC_message_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:weightSum="100">
+
+        <EditText
+            android:id="@+id/FC_message_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="93"
+            android:background="@color/colorWhite"
+            android:hint="Enter Message"
+            android:inputType="textAutoCorrect|textMultiLine"
+            android:maxLines="4"
+            android:padding="14dp"
+            android:textSize="16dp" />
+
+        <Button
+            android:id="@+id/FC_message_send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_weight="7"
+            android:background="@color/primaryColor"
+            android:gravity="center"
+            android:text="SEND"
+            android:textColor="@color/colorWhite" />
+    </LinearLayout>
+</RelativeLayout>

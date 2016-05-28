@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.example.amankumar.lucidme.Account.LoginActivity;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.UI.Chat.ChatFragment;
+import com.example.amankumar.lucidme.UI.Chat.FindChatActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -140,6 +141,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (user == null) {
                     SharedPreferences.Editor spe = sp.edit();
                     spe.putString(Constants.CURRENT_USER, null).apply();
+                    spe.putString(Constants.CURRENT_USER_NAME,null).apply();
                     takeUserToLoginScreenOnUnAuth();
                 }
             }
@@ -160,7 +162,10 @@ public class HomeActivity extends AppCompatActivity {
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                userNameText.setText(dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString());
+                String name=dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString();
+                SharedPreferences.Editor spe=sp.edit();
+                spe.putString(Constants.CURRENT_USER_NAME,name).apply();
+                userNameText.setText(name);
             }
 
             @Override
@@ -278,6 +283,10 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(this, DreamActivity.class);
             intent.putExtra("caller", "Home");
             startActivityForResult(intent, ADD_DREAM);
+        }
+        else{
+            Intent intent = new Intent(this, FindChatActivity.class);
+            startActivity(intent);
         }
     }
 

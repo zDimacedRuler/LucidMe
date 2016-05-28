@@ -23,7 +23,7 @@
 
     <dimen name="list_created_by_text_size">12sp</dimen>
     <dimen name="lv_header_text_size">10sp</dimen>
-    <dimen name="list_item_text_size">15sp</dimen>
+    <dimen name="list_item_text_size">16sp</dimen>
     <dimen name="login_buttons_text_size">15.3sp</dimen>
 
     <dimen name="detail_backdrop_height">256dp</dimen>

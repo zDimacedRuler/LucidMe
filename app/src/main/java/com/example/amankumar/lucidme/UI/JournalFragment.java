@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.Utils.Constants;
+import com.example.amankumar.lucidme.Utils.SimpleDividerItemDecoration;
 import com.example.amankumar.lucidme.Utils.Utils;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -38,14 +39,17 @@ public class JournalFragment extends Fragment {
     String currentUser;
     SharedPreferences sp;
     FirebaseDatabase ref;
+
     DatabaseReference dreamRef, userDreamRef;
     RecyclerView dreamRecyclerView;
     Query query;
     RecyclerViewAdapter recyclerViewAdapter;
     CardView noDreamCardView;
+
     public JournalFragment() {
         // Required empty public constructor
     }
+
     public static JournalFragment newInstance() {
         JournalFragment fragment = new JournalFragment();
         return fragment;
@@ -64,18 +68,18 @@ public class JournalFragment extends Fragment {
         currentUser = sp.getString(Constants.CURRENT_USER, "");
         dreamRecyclerView = (RecyclerView) view.findViewById(R.id.dreamRecyclerView);
         noDreamCardView = (CardView) view.findViewById(R.id.DF_no_dream_card_view);
-        ref=FirebaseDatabase.getInstance();
-        dreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
+        ref = FirebaseDatabase.getInstance();
+        dreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
         dreamRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(Constants.LOCATION_DREAMS).exists()) {
                     noDreamCardView.setVisibility(View.GONE);
-                    userDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
+                    userDreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
                     query = userDreamRef.orderByChild("dateOfDream");
                     recyclerViewAdapter = new RecyclerViewAdapter(Dream.class, R.layout.listview, RecyclerViewHolder.class, query);
                     dreamRecyclerView.setLayoutManager(new NpaGridLayoutManager(getActivity()));
-//                    dreamRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
+                    dreamRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
                     dreamRecyclerView.setAdapter(recyclerViewAdapter);
                 } else {
                     noDreamCardView.setVisibility(View.VISIBLE);
@@ -95,7 +99,8 @@ public class JournalFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         getActivity().getMenuInflater().inflate(R.menu.menu_home, menu);
     }
-    public class RecyclerViewAdapter extends FirebaseRecyclerAdapter<Dream,RecyclerViewHolder>{
+
+    public class RecyclerViewAdapter extends FirebaseRecyclerAdapter<Dream, RecyclerViewHolder> {
 
         public RecyclerViewAdapter(Class<Dream> modelClass, int modelLayout, Class<RecyclerViewHolder> viewHolderClass, Query ref) {
             super(modelClass, modelLayout, viewHolderClass, ref);
@@ -105,27 +110,27 @@ public class JournalFragment extends Fragment {
         protected void populateViewHolder(RecyclerViewHolder viewHolder, Dream model, int position) {
             viewHolder.titleText.setText(model.getTitleDream());
             viewHolder.dreamText.setText(model.getDream());
-            long milliseconds=model.getDateOfDream();
+            long milliseconds = model.getDateOfDream();
             GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
             calendar.setTimeInMillis(milliseconds);
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            int year=calendar.get(Calendar.YEAR);
-            int month=calendar.get(Calendar.MONTH);
-            month+=1;
-            String dateText=dayOfMonth+"/"+month+"/"+year;
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            month += 1;
+            String dateText = dayOfMonth + "/" + month + "/" + year;
             viewHolder.dayText.setText(Utils.getDay(dayOfWeek));
             viewHolder.dateText.setText(dateText);
-            String lucid=model.getLucid();
-            if(lucid.equals("True"))
+            String lucid = model.getLucid();
+            if (lucid.equals("True"))
                 viewHolder.lucidImage.setVisibility(View.VISIBLE);
             else
                 viewHolder.lucidImage.setVisibility(View.GONE);
-            HashMap<String, Object> obj=model.getUserDreamSigns();
-            if(obj==null){
+            HashMap<String, Object> obj = model.getUserDreamSigns();
+            if (obj == null) {
                 viewHolder.labelImage.setVisibility(View.GONE);
                 viewHolder.labelText.setVisibility(View.GONE);
-            }else{
+            } else {
                 viewHolder.labelImage.setVisibility(View.VISIBLE);
                 viewHolder.labelText.setVisibility(View.VISIBLE);
                 ArrayList<String> dreamSigns = (ArrayList<String>) obj.get(Constants.CONSTANT_USERDREAMSIGNS);
@@ -148,6 +153,7 @@ public class JournalFragment extends Fragment {
             });
         }
     }
+
     private static class NpaGridLayoutManager extends LinearLayoutManager {
         public NpaGridLayoutManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
             super(context, attrs, defStyleAttr, defStyleRes);

@@ -70,4 +70,7 @@ public class Utils {
                 return "";
         }
     }
+    public static int compareEmail(String email1,String email2){
+        return email1.compareTo(email2);
+    }
 }

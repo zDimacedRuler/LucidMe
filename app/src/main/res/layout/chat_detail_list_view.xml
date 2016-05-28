@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    android:background="#EEE"
+    android:clickable="false"
+    android:descendantFocusability="blocksDescendants"
+    android:focusable="false"
+    android:foreground="?selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/margin_small"
+    android:paddingRight="@dimen/margin_small"
+    android:paddingStart="@dimen/margin_small">
+
+    <LinearLayout
+        android:id="@+id/rightMessageLinear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginStart="25dp"
+        android:background="@drawable/rounded_box_gray"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/rightmessageText_LV"
+            style="@style/ListItemText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fadingEdgeLength="5dp"
+            android:paddingLeft="14dp"
+            android:paddingBottom="5dp"
+            android:fontFamily="serif"
+            android:paddingRight="14dp"
+            android:paddingTop="8dp"
+            android:textColor="#f34b4646"
+            tools:text="AMan is a good boy" />
+
+        <TextView
+            android:id="@+id/rightMessageTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#f3807878"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="8dp"
+            android:textSize="12sp"
+            tools:text="16:45" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/leftMessageLinear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginRight="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/rounded_box_white"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/leftmessageText_LV"
+            style="@style/ListItemText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp"
+            android:paddingBottom="5dp"
+            tools:text="This is who we"
+            android:paddingTop="8dp"
+            android:textColor="#f34b4646" />
+        <TextView
+            android:id="@+id/leftmessageTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#f3807878"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="8dp"
+            android:textSize="12sp"
+            tools:text="16:45" />
+    </LinearLayout>
+</LinearLayout>
