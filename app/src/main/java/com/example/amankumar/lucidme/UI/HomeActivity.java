@@ -141,7 +141,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (user == null) {
                     SharedPreferences.Editor spe = sp.edit();
                     spe.putString(Constants.CURRENT_USER, null).apply();
-                    spe.putString(Constants.CURRENT_USER_NAME,null).apply();
+                    spe.putString(Constants.CURRENT_USER_NAME, null).apply();
                     takeUserToLoginScreenOnUnAuth();
                 }
             }
@@ -162,9 +162,9 @@ public class HomeActivity extends AppCompatActivity {
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String name=dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString();
-                SharedPreferences.Editor spe=sp.edit();
-                spe.putString(Constants.CURRENT_USER_NAME,name).apply();
+                String name = dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString();
+                SharedPreferences.Editor spe = sp.edit();
+                spe.putString(Constants.CURRENT_USER_NAME, name).apply();
                 userNameText.setText(name);
             }
 
@@ -262,9 +262,6 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.action_logout:
                 FirebaseAuth.getInstance().signOut();
                 break;
-            case R.id.action_test:
-                Intent intent = new Intent(this, TestActivity.class);
-                startActivity(intent);
         }
         return true;
     }
@@ -283,8 +280,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(this, DreamActivity.class);
             intent.putExtra("caller", "Home");
             startActivityForResult(intent, ADD_DREAM);
-        }
-        else{
+        } else {
             Intent intent = new Intent(this, FindChatActivity.class);
             startActivity(intent);
         }
@@ -382,4 +378,5 @@ public class HomeActivity extends AppCompatActivity {
         }
         return uri.getPath();
     }
+
 }

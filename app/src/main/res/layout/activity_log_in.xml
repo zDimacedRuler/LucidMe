@@ -27,7 +27,7 @@
                 android:layout_marginTop="100dp"
                 android:gravity="center"
                 android:text="@string/app_name"
-                android:textColor="@color/colorWhite"
+                android:textColor="#FFF"
                 android:textSize="40sp" />
 
             <android.support.design.widget.TextInputLayout
@@ -78,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:onClick="LoginButtonHandler"
+                android:textColor="#fff"
                 android:text="@string/login_text" />
 
             <View
@@ -91,7 +92,7 @@
                 android:layout_marginTop="15dp"
                 android:elevation="4dp"
                 android:text="@string/new_dreamer_text"
-                android:textColor="@color/colorWhite" />
+                android:textColor="#fff" />
 
            <Button
                android:layout_width="match_parent"
@@ -99,6 +100,7 @@
                style="@style/MyButtonStyle"
                android:onClick="SignUpButtonHandler"
                android:text="@string/sign_up_button_text"
+               android:textColor="#fff"
                android:layout_marginTop="30dp"/>
 
         </LinearLayout>

@@ -12,6 +12,7 @@ public class ChatMessageModel {
     String author;
     String message;
     HashMap<String,Object> messageTimestamp;
+    String sharedDream;
 
     public ChatMessageModel() {
     }
@@ -22,8 +23,17 @@ public class ChatMessageModel {
         HashMap<String,Object> obj=new HashMap<>();
         obj.put(Constants.CONSTANT_TIMESTAMP, ServerValue.TIMESTAMP);
         messageTimestamp=obj;
+        sharedDream="false";
     }
 
+    public ChatMessageModel(String message, String sharedDream, String author) {
+        this.message = message;
+        HashMap<String,Object> obj=new HashMap<>();
+        obj.put(Constants.CONSTANT_TIMESTAMP, ServerValue.TIMESTAMP);
+        messageTimestamp=obj;
+        this.sharedDream = sharedDream;
+        this.author = author;
+    }
 
     public String getAuthor() {
         return author;
@@ -36,4 +46,9 @@ public class ChatMessageModel {
     public HashMap<String, Object> getMessageTimestamp() {
         return messageTimestamp;
     }
+
+    public String getSharedDream() {
+        return sharedDream;
+    }
+
 }

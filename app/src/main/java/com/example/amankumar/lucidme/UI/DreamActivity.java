@@ -239,17 +239,10 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
                 key.setValue(dreamEntry);
                 setResult(RESULT_DONE);
                 finish();
-               /* Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).push();
-                key.setValue(dreamEntry);
-                setResult(RESULT_DONE);
-                finish();*/
             } else {
                 addDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
                 addDreamRef.setValue(dreamEntry);
                 finish();
-                /*Firebase key = ref.child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
-                key.setValue(dreamEntry);
-                finish();*/
             }
         }
     }

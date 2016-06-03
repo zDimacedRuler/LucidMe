@@ -1,12 +1,13 @@
 package com.example.amankumar.lucidme.UI.Chat;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -56,18 +57,20 @@ public class ChatDetailActivity extends AppCompatActivity {
             protected void populateView(View v, ChatMessageModel model, int position) {
                 TextView leftMessageText = (TextView) v.findViewById(R.id.leftmessageText_LV);
                 TextView rightMessageText = (TextView) v.findViewById(R.id.rightmessageText_LV);
-                TextView leftTime= (TextView) v.findViewById(R.id.leftmessageTimeText);
-                TextView rightTime= (TextView) v.findViewById(R.id.rightMessageTimeText);
-                LinearLayout leftMessageLinear= (LinearLayout) v.findViewById(R.id.leftMessageLinear);
-                LinearLayout rightMessageLinear= (LinearLayout) v.findViewById(R.id.rightMessageLinear);
+                TextView leftTime = (TextView) v.findViewById(R.id.leftmessageTimeText);
+                TextView rightTime = (TextView) v.findViewById(R.id.rightMessageTimeText);
+                LinearLayout leftMessageLinear = (LinearLayout) v.findViewById(R.id.leftMessageLinear);
+                LinearLayout rightMessageLinear = (LinearLayout) v.findViewById(R.id.rightMessageLinear);
+                Button leftButton = (Button) v.findViewById(R.id.leftMessageButton);
+                Button rightButton = (Button) v.findViewById(R.id.rightMessageButton);
                 HashMap<String, Object> map = model.getMessageTimestamp();
                 Long milli = (Long) map.get(Constants.CONSTANT_TIMESTAMP);
-                String time;
+                final String time, dreamId;
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(milli);
                 int hour = calendar.get(Calendar.HOUR);
-                if(hour==0)
-                    hour=12;
+                if (hour == 0)
+                    hour = 12;
                 int min = calendar.get(Calendar.MINUTE);
                 int amOrPm = calendar.get(Calendar.AM_PM);
                 if (amOrPm == 0) {
@@ -78,28 +81,65 @@ public class ChatDetailActivity extends AppCompatActivity {
                 String author = model.getAuthor();
                 if (author.equals(currentUser)) {
                     rightMessageLinear.setVisibility(View.VISIBLE);
-                    String text=model.getMessage();
-                    if(text.length()<=20) {
-                        rightMessageLinear.setOrientation(LinearLayout.HORIZONTAL);
-                    }
-                    else{
-                        rightMessageLinear.setOrientation(LinearLayout.VERTICAL);
-                    }
-                    rightMessageText.setText(text);
+                    String text = model.getMessage();
                     rightTime.setText(time);
                     leftMessageLinear.setVisibility(View.GONE);
+                    if (model.getSharedDream().equals("false")) {
+                        if (text.length() <= 20) {
+                            rightMessageLinear.setOrientation(LinearLayout.HORIZONTAL);
+                        } else {
+                            rightMessageLinear.setOrientation(LinearLayout.VERTICAL);
+                        }
+                        rightMessageText.setText(text);
+                        rightButton.setVisibility(View.GONE);
+                    } else {
+                        rightMessageLinear.setOrientation(LinearLayout.VERTICAL);
+                        rightButton.setVisibility(View.VISIBLE);
+                        dreamId = model.getSharedDream();
+                        rightButton.setText(text);
+                        rightButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(ChatDetailActivity.this, ReadSharedDream.class);
+                                intent.putExtra("dreamId", dreamId);
+                                intent.putExtra("sharedUser", listId);
+                                intent.putExtra("userName", "You");
+                                startActivity(intent);
+                            }
+                        });
+                        rightMessageText.setText("Read this dream of mine");
+                    }
                 } else {
                     leftMessageLinear.setVisibility(View.VISIBLE);
-                    String text=model.getMessage();
-                    if(text.length()<=20) {
-                        leftMessageLinear.setOrientation(LinearLayout.HORIZONTAL);
-                    }
-                    else{
-                        leftMessageLinear.setOrientation(LinearLayout.VERTICAL);
-                    }
-                    leftMessageText.setText(text);
+                    String text = model.getMessage();
                     leftTime.setText(time);
                     rightMessageLinear.setVisibility(View.GONE);
+                    if (model.getSharedDream().equals("false")) {
+                        leftButton.setVisibility(View.GONE);
+                        if (text.length() <= 20) {
+                            leftMessageLinear.setOrientation(LinearLayout.HORIZONTAL);
+                        } else {
+                            leftMessageLinear.setOrientation(LinearLayout.VERTICAL);
+                        }
+                        leftMessageText.setText(text);
+
+                    } else {
+                        leftMessageLinear.setOrientation(LinearLayout.VERTICAL);
+                        leftButton.setVisibility(View.VISIBLE);
+                        dreamId = model.getSharedDream();
+                        leftButton.setText(text);
+                        leftButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(ChatDetailActivity.this, ReadSharedDream.class);
+                                intent.putExtra("dreamId", dreamId);
+                                intent.putExtra("sharedUser", listId);
+                                intent.putExtra("userName", userName);
+                                startActivity(intent);
+                            }
+                        });
+                        leftMessageText.setText("Read this dream of mine");
+                    }
                 }
             }
         };
@@ -129,7 +169,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         if (message.equals(""))
             return;
         messageRef = ref.getReference().child(Constants.LOCATION_USER_CHATS).child(chatId);
-        final ChatMessageModel messageModel = new ChatMessageModel(currentUser, message);
+        ChatMessageModel messageModel = new ChatMessageModel(currentUser, message);
         messageRef.push().setValue(messageModel);
         messageEdit.setText("");
         senderChatRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -152,7 +192,6 @@ public class ChatDetailActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ChatModel chatModel1 = dataSnapshot.getValue(ChatModel.class);
                 String receiverUserName = chatModel1.getUserName();
-                Log.e("CHat Detail", receiverUserName);
                 String receiverMessage = receiverUserName + ": " + message;
                 ChatModel receiverModel = new ChatModel(receiverUserName, receiverMessage);
                 receiverChatRef.setValue(receiverModel);

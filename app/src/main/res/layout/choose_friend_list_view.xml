@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:orientation="horizontal">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/FC_user_profile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_dummy_profile_primary"
+        app:civ_border_color="@color/colorGrey"
+        app:civ_border_width="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/SF_userName_LV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="serif"
+            android:maxLines="1"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            tools:text="aman Kumar" />
+
+        <TextView
+            android:id="@+id/SF_userEmail_LV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:maxLines="1"
+            android:textSize="15sp"
+            tools:text="zdcyberboy@gmail.com" />
+    </LinearLayout>
+</LinearLayout>

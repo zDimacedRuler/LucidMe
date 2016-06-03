@@ -34,5 +34,8 @@ public class Constants {
     public static final String LOCATION_CHATS="CHATS";
     public static final String CONSTANT_TO="_TO_";
     public static final String CONSTANT_AND="_AND_";
+    //share dream
+    public static final String LOCATION_SHARED_DREAM="SHARED_DREAM";
 
+    public static final String NIGHT_MODE ="night_mode" ;
 }

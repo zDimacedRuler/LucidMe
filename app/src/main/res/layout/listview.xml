@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:layout_marginBottom="5dp"
     android:clickable="true"
     android:descendantFocusability="blocksDescendants"
     android:focusable="false">
@@ -16,6 +14,8 @@
         android:paddingBottom="5dp"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
+        android:paddingRight="@dimen/margin_small"
+        android:paddingEnd="@dimen/margin_small"
         android:paddingLeft="@dimen/margin_small"
         android:paddingStart="@dimen/margin_small">
 
@@ -29,11 +29,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/black"
                 android:fontFamily="serif"
                 android:layout_weight="90"
                 android:maxLines="1"
-                android:textSize="16sp"
+                android:textSize="15.5sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -50,7 +49,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:paddingRight="5dp"
                     android:text="Day"
-                    android:textColor="@color/primaryColor"
+                    android:textColor="@color/colorAccent"
                     android:textSize="12sp" />
 
                 <TextView
@@ -60,7 +59,7 @@
                     android:gravity="bottom"
                     android:fontFamily="sans-serif-medium"
                     android:paddingRight="5dp"
-                    android:textColor="@color/primaryColor"
+                    android:textColor="@color/colorAccent"
                     android:textSize="12sp"
                     tools:text="5" />
 
@@ -89,7 +88,7 @@
                     android:gravity="bottom"
                     android:fontFamily="sans-serif-medium"
                     tools:text="label"
-                    android:textColor="@color/primaryColor"
+                    android:textColor="@color/colorAccent"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -98,8 +97,8 @@
                 style="@style/ListItemText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
                 android:layout_marginTop="2dp"
+                android:textSize="14sp"
                 android:maxLines="3" />
         </LinearLayout>
     </LinearLayout>

@@ -15,10 +15,10 @@
         android:id="@+id/CD_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/CD_message_linear"
         android:layout_below="@+id/Cd_appBar"
         android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll"
-        android:layout_above="@+id/CD_message_linear"/>
+        android:transcriptMode="alwaysScroll" />
 
     <LinearLayout
         android:id="@+id/CD_message_linear"
@@ -39,8 +39,8 @@
             android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
             android:maxLines="4"
             android:padding="14dp"
-            tools:text="kfjhdsjkfjk"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            tools:text="kfjhdsjkfjk" />
 
         <ImageButton
             android:id="@+id/CD_message_send_button"
@@ -48,7 +48,7 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom"
             android:layout_weight="10"
-            android:background="@color/primaryColor"
+            android:background="@color/colorAccent"
             android:onClick="sendMessageHandler"
             android:src="@drawable/ic_send_white_24dp" />
     </LinearLayout>

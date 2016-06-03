@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.R;
+import com.example.amankumar.lucidme.UI.Chat.SelectFriendActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
 import com.google.firebase.database.DataSnapshot;
@@ -67,7 +68,6 @@ public class DreamDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         dreamDetailRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
-//        dreamDetailRef = new Firebase(Constants.FIREBASE_USERS_URL).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
         dreamDetailRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -165,8 +165,10 @@ public class DreamDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_share) {
+            Intent intent=new Intent(this, SelectFriendActivity.class);
+            intent.putExtra("listId", listId);
+            startActivity(intent);
         }
         if(id==android.R.id.home){
             finish();

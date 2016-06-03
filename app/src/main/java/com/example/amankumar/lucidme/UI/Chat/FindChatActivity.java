@@ -115,6 +115,8 @@ public class FindChatActivity extends AppCompatActivity {
                 Intent intent=new Intent(FindChatActivity.this,ChatDetailActivity.class);
                 intent.putExtra("listId",encodedFindUserMail);
                 intent.putExtra("name", recipientName);
+                SharedPreferences.Editor spe = sp.edit();
+                spe.putString(RECIPIENT_NAME, null).apply();
                 startActivity(intent);
                 finish();
             }
@@ -132,8 +134,14 @@ public class FindChatActivity extends AppCompatActivity {
         if (findUserMail.equals(""))
             return;
         encodedFindUserMail = Utils.encodeEmail(findUserMail);
-        if (encodedFindUserMail.equals(currentUser))
+        if (encodedFindUserMail.equals(currentUser)){
+            resultLinear.setVisibility(View.VISIBLE);
+            userProfileImage.setVisibility(View.GONE);
+            resultText.setGravity(Gravity.CENTER);
+            resultText.setText("Cannot make yourself a friend!");
+            messageLinear.setVisibility(View.GONE);
             return;
+        }
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

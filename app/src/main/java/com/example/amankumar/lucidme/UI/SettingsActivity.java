@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -30,8 +32,9 @@ public class SettingsActivity extends AppCompatActivity {
     Toolbar toolbar;
     SharedPreferences sp;
     Switch disableAllSwitch, wakeUpWithJournalSwitch;
+    Switch nightModeSwitch;
     LinearLayout toDisableView;
-    Boolean disableAll,wakeUpWithJournalState;
+    Boolean disableAll,wakeUpWithJournalState,nightMode;
     static SharedPreferences.Editor spe;
     static Button fromTimePickerButton, toTimePickerButton;
     static Button sleepWithJournalButton, wakeUpWithJournalButton;
@@ -79,10 +82,13 @@ public class SettingsActivity extends AppCompatActivity {
         wakeUpWithJournalButton.setText(showTime(wakeHour, wakeMinute));
         sleepWithJournalButton.setText(showTime(sleepHour, sleepMinute));
         toDisableView = (LinearLayout) findViewById(R.id.S_to_disable_view);
+        nightModeSwitch= (Switch) findViewById(R.id.S_night_mode_switch);
         disableAllSwitch = (Switch) findViewById(R.id.S_disable_all_switch);
         wakeUpWithJournalSwitch = (Switch) findViewById(R.id.S_wake_up_with_journal_switch);
         disableAll = sp.getBoolean(Constants.DISABLE_ALL_STATE, true);
+        nightMode=sp.getBoolean(Constants.NIGHT_MODE,false);
         wakeUpWithJournalState=sp.getBoolean(Constants.WAKE_UP_JOURNAL_STATE,true);
+        nightModeSwitch.setChecked(nightMode);
         disableAllSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -137,6 +143,20 @@ public class SettingsActivity extends AppCompatActivity {
     public void WakeUpWithJournalHandler(View view) {
         DialogFragment dialogFragment = new WakeUpWithJournalPicker();
         dialogFragment.show(getSupportFragmentManager(), "WakeUpWithJournal");
+    }
+
+    public void CheckChangedListener(View view) {
+        nightMode=sp.getBoolean(Constants.NIGHT_MODE,false);
+        if(nightMode==Boolean.TRUE){
+            spe.putBoolean(Constants.NIGHT_MODE,false).apply();
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            nightModeSwitch.setChecked(false);
+        }else{
+            spe.putBoolean(Constants.NIGHT_MODE,true).apply();
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            nightModeSwitch.setChecked(true);
+        }
+        recreate();
     }
 
     public static class SleepWithJournalPicker extends DialogFragment
@@ -238,5 +258,25 @@ public class SettingsActivity extends AppCompatActivity {
         String aTime = new StringBuilder().append(hours).append(':')
                 .append(minutes).append(" ").append(timeSet).toString();
         return aTime;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent=new Intent(this,HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent=new Intent(this,HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }
