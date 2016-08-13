@@ -9,79 +9,76 @@
         android:id="@+id/app_bar"
         layout="@layout/appbar" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/app_bar"
-        android:layout_margin="5dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="100">
-
-                <TextView
-                    android:id="@+id/DatePickerButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="50"
-                    android:drawableLeft="@drawable/ic_time_gray_18dp"
-                    android:drawablePadding="5dp"
-                    android:gravity="bottom"
-                    android:onClick="showDatePickerDialog"
-                    android:padding="14dp"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="17sp" />
-
-                <CheckBox
-                    android:id="@+id/dream_lucid_checkBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="50"
-                    android:checked="false"
-                    android:text="Lucid"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/technique_dream_EditText"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:background="@color/colorWhite"
-                android:drawableLeft="@drawable/ic_build_grey"
-                android:drawablePadding="5dp"
-                android:hint="Technique Used"
-                android:inputType="textAutoCorrect|textCapSentences"
-                android:padding="14dp"
-                android:textSize="17sp"
-                android:visibility="gone"
-                tools:visibility="visible" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
-
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cardView">
+        android:layout_below="@+id/app_bar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="100">
+
+                        <TextView
+                            android:id="@+id/DatePickerButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="50"
+                            android:drawableLeft="@drawable/ic_time_gray_18dp"
+                            android:drawablePadding="5dp"
+                            android:gravity="bottom"
+                            android:onClick="showDatePickerDialog"
+                            android:padding="14dp"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="17sp" />
+
+                        <CheckBox
+                            android:id="@+id/dream_lucid_checkBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="6dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_weight="50"
+                            android:checked="false"
+                            android:text="Lucid"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="17sp" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/technique_dream_EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:background="@color/colorWhite"
+                        android:hint="Technique Used"
+                        android:inputType="textAutoCorrect|textCapSentences"
+                        android:padding="14dp"
+                        android:textSize="16.5sp"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/dream_tag_card_view"
@@ -132,14 +129,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorWhite"
-                        android:drawableLeft="@drawable/ic_title_gray"
-                        android:drawablePadding="5dp"
                         android:hint="@string/hint_title"
                         android:inputType="textCapSentences|textAutoCorrect"
                         android:padding="14dp"
                         android:singleLine="true"
                         android:textColor="@color/colorAccent"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <EditText
@@ -151,7 +146,7 @@
                         android:hint="@string/hint_write_your_dream"
                         android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
                         android:padding="14dp"
-                        android:textSize="18sp">
+                        android:textSize="16.5sp">
 
                         <requestFocus></requestFocus>
                     </EditText>
@@ -165,20 +160,21 @@
                         android:hint="Additional Notes"
                         android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
                         android:padding="14dp"
-                        android:textSize="18sp" />
+                        android:textSize="16.5sp" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
     </ScrollView>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/SaveDreamButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_done_white_24dp"
         android:layout_margin="16dp"
         android:onClick="storeDreamHandler"
+        android:src="@drawable/ic_done_white_24dp"
         app:elevation="6dp"
         app:fabSize="normal" />
 </RelativeLayout>

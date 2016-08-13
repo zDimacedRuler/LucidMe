@@ -20,24 +20,27 @@
             android:layout_marginRight="30dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/LA_image"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
-                android:gravity="center"
-                android:text="@string/app_name"
-                android:textColor="#fff"
-                android:textSize="40sp" />
-
-            <Spinner
-                android:id="@+id/email_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="60dp"
+                android:src="@drawable/lucidme" />
+
+            <EditText
+                android:id="@+id/email_SignUpEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:background="@color/colorWhite"
-                android:paddingBottom="14dp"
-                android:paddingLeft="5dp"
-                android:paddingTop="14dp" />
+                android:hint="@string/hint_email"
+                android:inputType="text"
+                android:nextFocusDown="@+id/username_SignUpEditText"
+                android:padding="14dp"
+                android:singleLine="true"
+                android:textColorHint="@color/colorSecondaryText"
+                android:textSize="15.3sp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -87,8 +90,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:onClick="SignUpUserHandler"
-                android:textColor="#fff"
-                android:text="@string/sign_up_button_text" />
+                android:text="@string/sign_up_button_text"
+                android:textColor="#fff" />
         </LinearLayout>
     </ScrollView>
 

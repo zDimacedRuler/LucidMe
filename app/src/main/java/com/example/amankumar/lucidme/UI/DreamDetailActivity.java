@@ -35,15 +35,15 @@ public class DreamDetailActivity extends AppCompatActivity {
     //Display ViewGroups
     TextView dateOfDreamText, lucidTechniqueText;
     TextView dreamSignText;
-    TextView titleText, dreamText, notesText,labelText;
-    ImageView lucidImage,labelImage;
+    TextView titleText, dreamText, notesText, labelText,lastText;
+    ImageView lucidImage, labelImage;
     CardView dreamSignCard;
     CardView notesCardView;
     CardView techniqueCardView;
     //associated strings
     String lucidTechnique, lucidState, title, dream, notes;
     ArrayList<String> dreamSigns;
-    GregorianCalendar gregorianCalendar;
+    GregorianCalendar gregorianCalendar, lastGregorianCalendar;
     Toolbar toolbar;
     String listId;
     String encodedEmail;
@@ -67,13 +67,13 @@ public class DreamDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        dreamDetailRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+        dreamDetailRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
         dreamDetailRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Dream dreamModel = dataSnapshot.getValue(Dream.class);
                 //date
-                long milliseconds=dreamModel.getDateOfDream();
+                long milliseconds = dreamModel.getDateOfDream();
                 gregorianCalendar.setTimeInMillis(milliseconds);
                 int monthOfYear = gregorianCalendar.get(Calendar.MONTH);
                 int dayOfMonth = gregorianCalendar.get(Calendar.DAY_OF_MONTH);
@@ -91,7 +91,7 @@ public class DreamDetailActivity extends AppCompatActivity {
                     if (!lucidTechnique.equals("")) {
                         techniqueCardView.setVisibility(View.VISIBLE);
                         lucidTechniqueText.setText(lucidTechnique);
-                    }else{
+                    } else {
                         techniqueCardView.setVisibility(View.GONE);
                     }
                 } else {
@@ -126,6 +126,18 @@ public class DreamDetailActivity extends AppCompatActivity {
                     notesText.setText(notes);
                 } else
                     notesCardView.setVisibility(View.GONE);
+                HashMap<String, Object> obj;
+                obj = dreamModel.getTimeStampLastChanged();
+                long milliLastEdited= (long) obj.get("timestamp");
+                lastGregorianCalendar.setTimeInMillis(0-milliLastEdited);
+                int lMonthOfYear = lastGregorianCalendar.get(Calendar.MONTH);
+                int lDayOfMonth = lastGregorianCalendar.get(Calendar.DAY_OF_MONTH);
+                int lDayOfWeek = lastGregorianCalendar.get(Calendar.DAY_OF_WEEK);
+                String lDay = Utils.getDay(lDayOfWeek);
+                String lMonth = Utils.getMonth(lMonthOfYear);
+                int lYear = lastGregorianCalendar.get(Calendar.YEAR);
+                String lastEdited = "Last Edited: "+lDay + "," + lDayOfMonth + " " + lMonth + " " + lYear;
+                lastText.setText(lastEdited);
             }
 
             @Override
@@ -145,14 +157,16 @@ public class DreamDetailActivity extends AppCompatActivity {
         titleText = (TextView) findViewById(R.id.DD_title_Text);
         dreamText = (TextView) findViewById(R.id.DD_dream_Text);
         notesText = (TextView) findViewById(R.id.DD_notes_Text);
-        labelImage= (ImageView) findViewById(R.id.DD_imageLabel);
-        labelText= (TextView) findViewById(R.id.DD_textLabel);
+        labelImage = (ImageView) findViewById(R.id.DD_imageLabel);
+        labelText = (TextView) findViewById(R.id.DD_textLabel);
         dreamSignCard = (CardView) findViewById(R.id.DD_dreamSign_card_view);
         notesCardView = (CardView) findViewById(R.id.DD_notes_card_view);
-        techniqueCardView= (CardView) findViewById(R.id.DD_lucid_technique_card_view);
+        techniqueCardView = (CardView) findViewById(R.id.DD_lucid_technique_card_view);
+        lastText= (TextView) findViewById(R.id.DD_last_Edit);
         dreamSigns = new ArrayList<>();
-        ref=FirebaseDatabase.getInstance();
-        gregorianCalendar= (GregorianCalendar) GregorianCalendar.getInstance();
+        ref = FirebaseDatabase.getInstance();
+        gregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
+        lastGregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
     }
 
     @Override
@@ -166,11 +180,11 @@ public class DreamDetailActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         if (id == R.id.action_share) {
-            Intent intent=new Intent(this, SelectFriendActivity.class);
+            Intent intent = new Intent(this, SelectFriendActivity.class);
             intent.putExtra("listId", listId);
             startActivity(intent);
         }
-        if(id==android.R.id.home){
+        if (id == android.R.id.home) {
             finish();
         }
         if (id == R.id.action_delete) {
@@ -179,7 +193,7 @@ public class DreamDetailActivity extends AppCompatActivity {
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    DatabaseReference deleteRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+                    DatabaseReference deleteRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
                     deleteRef.setValue(null);
                     finish();
                 }

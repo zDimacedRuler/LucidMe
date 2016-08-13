@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="DreamSigns">
-        <item>Happy</item>
-        <item>Sad</item>
-        <item>Time Travel</item>
-        <item>Angry</item>
-        <item>Nightmare</item>
-        <item>murder</item>
-    </array>
+    <string-array name="sort_items">
+        <item>Date Created</item>
+        <item>Recently Updated</item>
+        <item>Title</item>
+        <item>Oldest First</item>
+    </string-array>
 </resources>

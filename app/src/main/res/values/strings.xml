@@ -34,7 +34,6 @@
     <string name="search">search</string>
     <string name="title_activity_set_tag">SetTagActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="choose_dreamsigns">Choose DreamSigns</string>
     <string name="disable_all_text">Notifications bothering you or taking a break.Simply disable all the tools and enable them again to dive into the world of lucid dreaming.</string>
@@ -44,4 +43,13 @@
     <string name="sleep_with_journal_text">Read your nightly adventures everyday before sleeping. Incubate any of your previous dreams to increase the chance of lucidity in your dreams.</string>
     <string name="speech_prompt">Say something&#8230;</string>
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="hint_search">Search LucidMe</string>
+    <string name="copyright_text">LucidMe \n &#169; 2016 zDimacedRuler</string>
+    <string name="about_text">LucidMe is an app where you can store your dreams,view and edit them on multiple devices.The main objective of the app is to help you in your journey of lucid Dreaming.It hopes to give you an extra push into the rabbit hole of Lucid Dreaming.</string>
+    <string name="appreciation_text">Love the app? Show us your appreciation by rating, sharing the app and by providing us your valuable suggestions and comments </string>
+    <string name="rate_text">Rate Us 5 stars</string>
+    <string name="share">share</string>
+    <string name="feedback">feedback</string>
+    <string name="forgot_password_text">Forgot Password?</string>
+    <string name="explore_text">Explore the world of Lucid dreaming.Read various articles and faqs all related to lucid dreaming.Here we present you some websites to help gain you more insight in lucid dreaming.</string>
 </resources>

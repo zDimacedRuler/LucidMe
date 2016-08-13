@@ -1,8 +1,8 @@
 package com.example.amankumar.lucidme.Model;
 
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.google.firebase.database.ServerValue;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
@@ -12,7 +12,7 @@ public class Dream {
     String titleDream;
     String dream;
     long dateOfDream;
-    //added later
+    long revDateOfDream;
     HashMap<String,Object> timeStampLastChanged;
     HashMap<String,Object> userDreamSigns;
     String lucid;
@@ -26,12 +26,15 @@ public class Dream {
         this.titleDream = titleDream;
         this.dream = dream;
         this.dateOfDream = dateOfDream;
+        this.revDateOfDream=0-dateOfDream;
         this.userDreamSigns=userDreamSigns;
         this.lucid=lucid;
         this.lucidTechnique=lucidTechnique;
         this.additionalNotes=additionalNotes;
+        GregorianCalendar calendar=(GregorianCalendar) GregorianCalendar.getInstance();
+        long milli=calendar.getTimeInMillis();
         HashMap<String,Object> obj=new HashMap<>();
-        obj.put(Constants.CONSTANT_TIMESTAMP, ServerValue.TIMESTAMP);
+        obj.put(Constants.CONSTANT_TIMESTAMP,0-milli);
         this.timeStampLastChanged=obj;
     }
 

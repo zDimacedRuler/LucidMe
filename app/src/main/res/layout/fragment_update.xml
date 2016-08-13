@@ -1,0 +1,43 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.amankumar.lucidme.Update_Password.Update">
+
+    <EditText
+        android:id="@+id/update_frag_new_pass_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter New Password"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:maxLines="1"
+        android:background="@color/colorWhite"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        />
+    <EditText
+        android:id="@+id/update_frag_re_pass_edit"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/update_frag_new_pass_edit"
+        android:layout_height="wrap_content"
+        android:hint="Re-enter Password"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:maxLines="1"
+        android:imeOptions="actionDone"
+        android:background="@color/colorWhite"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Password"
+        android:textColor="#fff"
+        style="@style/MyButtonStyle"
+        android:id="@+id/update_frag_button"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

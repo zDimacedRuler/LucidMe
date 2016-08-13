@@ -55,6 +55,7 @@ public class SelectFriendActivity extends AppCompatActivity {
                 TextView userEmailText = (TextView) v.findViewById(R.id.SF_userEmail_LV);
                 userNameText.setText(userName);
                 String selectedEmail = listAdapter.getRef(position).getKey();
+                selectedEmail=Utils.decodeEmail(selectedEmail);
                 userEmailText.setText(selectedEmail);
             }
         };

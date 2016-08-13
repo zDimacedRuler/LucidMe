@@ -36,6 +36,14 @@ public class Constants {
     public static final String CONSTANT_AND="_AND_";
     //share dream
     public static final String LOCATION_SHARED_DREAM="SHARED_DREAM";
-
     public static final String NIGHT_MODE ="night_mode" ;
+    //pin lock
+    public static final String PIN_PASSWORD="pin_password";
+    public static final String PIN_STATE="pin_state";
+    public static final String BLOCK_STATE="block";
+    //sort
+    public static final String SORT_STATE="sort_state";
+    public static final String FOREGROUND="foreground";
+    public static final String FOREGROUND_USER="foreground_user";
+
 }

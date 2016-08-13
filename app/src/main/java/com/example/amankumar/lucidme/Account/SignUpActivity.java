@@ -1,7 +1,5 @@
 package com.example.amankumar.lucidme.Account;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,12 +7,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.amankumar.lucidme.R;
@@ -32,54 +27,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
 public class SignUpActivity extends AppCompatActivity {
-    ArrayList<String> emails;
-    Spinner emailSpinner;
-    String email,password,userName,encodedEmail;
-    ArrayAdapter<String> adapter;
-    EditText passwordEdit,userNameEdit;
+    String email, password, userName, encodedEmail;
+    EditText passwordEdit, userNameEdit,emailEdit;
     ProgressDialog mProgressDialog;
     FirebaseDatabase ref;
-    DatabaseReference userRef,userDetailRef;
+    DatabaseReference userRef, userDetailRef;
     DatabaseReference dreamSignRef;
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener authStateListener;
     SharedPreferences sp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         init();
-        try{
-            Account[] accounts= AccountManager.get(this).getAccountsByType("com.google");
-            for(Account account : accounts){
-                emails.add(account.name);
-            }
-        }
-        catch (Exception e){
-            Log.e("SignUpActivity","Exception:"+e);
-        }
-        adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,emails);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        emailSpinner.setAdapter(adapter);
-        emailSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                email=adapter.getItem(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        authStateListener=new FirebaseAuth.AuthStateListener() {
+        authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user!=null){
+                if (user != null) {
                     createUserInFireBaseHelper();
                     login();
                 }
@@ -87,18 +55,18 @@ public class SignUpActivity extends AppCompatActivity {
         };
     }
 
+
     private void init() {
-        ref=FirebaseDatabase.getInstance();
-        mAuth=FirebaseAuth.getInstance();
-        emailSpinner= (Spinner) findViewById(R.id.email_spinner);
-        emails=new ArrayList<>();
-        passwordEdit= (EditText) findViewById(R.id.password_SignUpEditText);
-        userNameEdit= (EditText) findViewById(R.id.username_SignUpEditText);
-        mProgressDialog=new ProgressDialog(this);
+        ref = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        emailEdit= (EditText) findViewById(R.id.email_SignUpEditText);
+        passwordEdit = (EditText) findViewById(R.id.password_SignUpEditText);
+        userNameEdit = (EditText) findViewById(R.id.username_SignUpEditText);
+        mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle("Loading...");
         mProgressDialog.setMessage("Creating Account");
         mProgressDialog.setCancelable(false);
-        sp= PreferenceManager.getDefaultSharedPreferences(this);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -110,30 +78,41 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(authStateListener!=null)
+        if (authStateListener != null)
             mAuth.removeAuthStateListener(authStateListener);
     }
 
     public void SignUpUserHandler(View view) {
-        password= String.valueOf(passwordEdit.getText());
-        userName= String.valueOf(userNameEdit.getText());
-        boolean validPassword=isPasswordValid(password);
-        boolean validUserName=isUserNameValid(userName);
-        if(!validPassword || !validUserName)
+        email=emailEdit.getText().toString();
+        password = String.valueOf(passwordEdit.getText());
+        userName = String.valueOf(userNameEdit.getText());
+        boolean validPassword = isPasswordValid(password);
+        boolean validUserName = isUserNameValid(userName);
+        boolean validEmail = isEmailValid(email);
+        if (!validPassword || !validUserName || !validEmail)
             return;
         mProgressDialog.show();
-        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 mProgressDialog.dismiss();
-                SharedPreferences.Editor spe=sp.edit();
+                SharedPreferences.Editor spe = sp.edit();
                 encodedEmail = Utils.encodeEmail(email);
-                spe.putString(Constants.CURRENT_USER,encodedEmail).apply();
-                if(!task.isSuccessful()){
+                spe.putString(Constants.CURRENT_USER, encodedEmail).apply();
+                if (!task.isSuccessful()) {
                     showErrorToast(task.getException().getMessage());
                 }
             }
         });
+    }
+
+    private boolean isEmailValid(String email) {
+        boolean isGoodEmail = (email != null && Patterns.EMAIL_ADDRESS.matcher(email).matches());
+        if (!isGoodEmail) {
+            emailEdit.setError("Invalid Email");
+            return false;
+        }
+        return true;
     }
 
     private void login() {
@@ -144,18 +123,19 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void createUserInFireBaseHelper() {
-        encodedEmail= Utils.encodeEmail(email);
-        userRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail);
-        userDetailRef=ref.getReference().child(Constants.LOCATION_USER_DETAILS);
-        dreamSignRef=ref.getReference().child(Constants.LOCATION_DREAMS_SIGNS);
+        encodedEmail = Utils.encodeEmail(email);
+        userRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail);
+        userDetailRef = ref.getReference().child(Constants.LOCATION_USER_DETAILS);
+        dreamSignRef = ref.getReference().child(Constants.LOCATION_DREAMS_SIGNS);
         userRef.child(Constants.LOCATION_USERNAME).setValue(userName);
         userDetailRef.child(encodedEmail).setValue(userName);
         dreamSignRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                DatabaseReference userDreamRef=FirebaseDatabase.getInstance().getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
+                DatabaseReference userDreamRef = FirebaseDatabase.getInstance().getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS_SIGNS);
                 userDreamRef.setValue(dataSnapshot.getValue());
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -168,7 +148,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean isUserNameValid(String userName) {
-        if (userName.length()<6) {
+        if (userName.length() < 6) {
             userNameEdit.setError("Username should have more than 6 characters");
             return false;
         }
@@ -176,7 +156,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean isPasswordValid(String password) {
-        if(password.length()<6){
+        if (password.length() < 6) {
             passwordEdit.setError("Password should not be empty and have more than 6 characters");
             return false;
         }

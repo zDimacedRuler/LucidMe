@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.amankumar.lucidme.Update_Password.ReAuthenticate">
+
+    <EditText
+        android:id="@+id/RE_frag_pass_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Password"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:maxLines="1"
+        android:imeOptions="actionDone"
+        android:background="@color/colorWhite"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:textColor="#fff"
+        style="@style/MyButtonStyle"
+        android:id="@+id/RE_frag_button"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

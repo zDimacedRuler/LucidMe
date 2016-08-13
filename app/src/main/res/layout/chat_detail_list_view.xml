@@ -21,14 +21,13 @@
         android:layout_gravity="end"
         android:layout_marginLeft="40dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/rounded_box_gray"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/rounded_box_primary"
         android:orientation="vertical">
 
         <Button
             android:id="@+id/rightMessageButton"
-            android:visibility="gone"
-            tools:visibility="visible"
+            android:visibility="visible"
             tools:text="Aman KUmar"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
@@ -36,13 +35,12 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:textSize="12sp"
-            android:fontFamily="serif"
             android:gravity="left|center_vertical"
             android:layout_marginTop="10dp"
             android:paddingLeft="6dp"
             android:paddingRight="6dp"
             android:drawablePadding="5dp"
-            android:background="@color/colorWhite"
+            android:background="@drawable/rounded_box_white"
             android:maxLines="1"
             android:drawableLeft="@drawable/ic_read_dream_accent_24dp" />
 
@@ -52,12 +50,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:fadingEdgeLength="5dp"
-            android:paddingBottom="5dp"
+            android:paddingBottom="8dp"
             android:paddingLeft="14dp"
             android:paddingRight="14dp"
             android:paddingTop="8dp"
-            android:textColor="#f34b4646"
+            android:textColor="@color/colorMidWhite"
             tools:text="AMan is a good boy" />
 
         <TextView
@@ -66,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
             android:layout_marginRight="8dp"
-            android:textColor="#f3807878"
+            android:textColor="@color/colorGrey"
             android:textSize="12sp"
             tools:text="16:45" />
     </LinearLayout>
@@ -78,31 +75,30 @@
         android:layout_gravity="start"
         android:layout_marginEnd="40dp"
         android:layout_marginRight="40dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/rounded_box_white"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/rounded_box_dark_grey"
         android:orientation="vertical">
 
         <Button
             android:id="@+id/leftMessageButton"
             android:visibility="gone"
             tools:visibility="visible"
-            tools:text="Aman KUmar is agood sfdsfgsdgfdg"
+            tools:text="Aman KUmar is a good boy"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorAccent"
             android:gravity="left|center_vertical"
             android:layout_gravity="left"
             android:layout_marginLeft="10dp"
-            android:fontFamily="serif"
             android:textSize="12sp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:paddingLeft="6dp"
             android:paddingRight="6dp"
             android:drawablePadding="5dp"
-            android:background="@color/colorAccent"
+            android:background="@drawable/rounded_box_white"
             android:maxLines="1"
-            android:drawableLeft="@drawable/ic_read_dream_gray_24dp"  />
+            android:drawableLeft="@drawable/ic_read_dream_accent_24dp"  />
 
         <TextView
             android:id="@+id/leftmessageText_LV"
@@ -110,11 +106,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:paddingBottom="5dp"
+            android:paddingBottom="8dp"
             android:paddingLeft="14dp"
             android:paddingRight="14dp"
             android:paddingTop="8dp"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/colorMidWhite"
             tools:text="This is who we" />
 
         <TextView
@@ -123,7 +119,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
             android:layout_marginRight="8dp"
-            android:textColor="#f3807878"
+            android:textColor="@color/colorMidWhite"
             android:textSize="12sp"
             tools:text="16:45" />
     </LinearLayout>

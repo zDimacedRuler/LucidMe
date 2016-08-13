@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +37,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     FirebaseDatabase ref;
     DatabaseReference senderChatRef, receiverChatRef, userChatRef, messageRef;
     SharedPreferences sp;
+    SharedPreferences.Editor spe;
     ListView chatListView;
     FirebaseListAdapter<ChatMessageModel> listAdapter;
     EditText messageEdit;
@@ -85,6 +88,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     rightTime.setText(time);
                     leftMessageLinear.setVisibility(View.GONE);
                     if (model.getSharedDream().equals("false")) {
+                        rightMessageText.setVisibility(View.VISIBLE);
                         if (text.length() <= 20) {
                             rightMessageLinear.setOrientation(LinearLayout.HORIZONTAL);
                         } else {
@@ -107,13 +111,13 @@ public class ChatDetailActivity extends AppCompatActivity {
                                 startActivity(intent);
                             }
                         });
-                        rightMessageText.setText("Read this dream of mine");
+                        rightMessageText.setVisibility(View.GONE);
                     }
                 } else {
                     leftMessageLinear.setVisibility(View.VISIBLE);
+                    rightMessageLinear.setVisibility(View.GONE);
                     String text = model.getMessage();
                     leftTime.setText(time);
-                    rightMessageLinear.setVisibility(View.GONE);
                     if (model.getSharedDream().equals("false")) {
                         leftButton.setVisibility(View.GONE);
                         if (text.length() <= 20) {
@@ -121,9 +125,10 @@ public class ChatDetailActivity extends AppCompatActivity {
                         } else {
                             leftMessageLinear.setOrientation(LinearLayout.VERTICAL);
                         }
+                        leftMessageText.setVisibility(View.VISIBLE);
                         leftMessageText.setText(text);
-
                     } else {
+                        leftMessageText.setVisibility(View.VISIBLE);
                         leftMessageLinear.setOrientation(LinearLayout.VERTICAL);
                         leftButton.setVisibility(View.VISIBLE);
                         dreamId = model.getSharedDream();
@@ -138,7 +143,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                                 startActivity(intent);
                             }
                         });
-                        leftMessageText.setText("Read this dream of mine");
+                        leftMessageText.setVisibility(View.GONE);
                     }
                 }
             }
@@ -149,6 +154,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private void init() {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
+        spe=sp.edit();
         currentUser = sp.getString(Constants.CURRENT_USER, "");
         ref = FirebaseDatabase.getInstance();
         chatListView = (ListView) findViewById(R.id.CD_list_view);
@@ -161,7 +167,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         } else {
             chatId = listId + Constants.CONSTANT_AND + currentUser;
         }
-
+        if(!Utils.haveNetworkConnection(this)){
+           Snackbar.make(toolbar,"No network connection",Snackbar.LENGTH_INDEFINITE).show();
+        }
     }
 
     public void sendMessageHandler(View view) {
@@ -191,6 +199,7 @@ public class ChatDetailActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ChatModel chatModel1 = dataSnapshot.getValue(ChatModel.class);
+                Log.d("Chat detail",dataSnapshot.toString());
                 String receiverUserName = chatModel1.getUserName();
                 String receiverMessage = receiverUserName + ": " + message;
                 ChatModel receiverModel = new ChatModel(receiverUserName, receiverMessage);
@@ -202,5 +211,20 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        spe.putBoolean(Constants.FOREGROUND,true).apply();
+        spe.putString(Constants.FOREGROUND_USER,listId).apply();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        spe.putBoolean(Constants.FOREGROUND,false).apply();
+        spe.putString(Constants.FOREGROUND_USER,"").apply();
+
     }
 }

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.amankumar.lucidme.Model.ChatMessageModel;
 import com.example.amankumar.lucidme.Model.ChatModel;
 import com.example.amankumar.lucidme.R;
+import com.example.amankumar.lucidme.Services.MessageNotificationService;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
 import com.google.firebase.database.DataSnapshot;
@@ -117,6 +118,9 @@ public class FindChatActivity extends AppCompatActivity {
                 intent.putExtra("name", recipientName);
                 SharedPreferences.Editor spe = sp.edit();
                 spe.putString(RECIPIENT_NAME, null).apply();
+                Intent serviceIntent=new Intent(FindChatActivity.this, MessageNotificationService.class);
+                stopService(serviceIntent);
+                startService(serviceIntent);
                 startActivity(intent);
                 finish();
             }

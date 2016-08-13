@@ -15,9 +15,11 @@ import com.google.firebase.database.FirebaseDatabase;
 public class LucidMeApp extends Application {
     SharedPreferences sp;
     Boolean nightMode;
+    private static LucidMeApp instance;
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         sp= PreferenceManager.getDefaultSharedPreferences(this);
         nightMode = sp.getBoolean(Constants.NIGHT_MODE, false);
@@ -25,5 +27,8 @@ public class LucidMeApp extends Application {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         else
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+    }
+    public static LucidMeApp getInstance(){
+        return instance;
     }
 }

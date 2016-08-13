@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import com.example.amankumar.lucidme.R;
 import com.example.amankumar.lucidme.UI.DreamActivity;
 
 /**
@@ -19,10 +22,13 @@ public class WakeUpWithJournalReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Uri sound= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notification = new NotificationCompat.Builder(context);
         notification.setAutoCancel(true);
         notification.setTicker("Tap to enter you dream");
         notification.setWhen(System.currentTimeMillis());
+        notification.setSmallIcon(R.drawable.ic_lucidme_notif);
+        notification.setSound(sound);
         notification.setContentTitle("Its time to record your dream");
         notification.setContentText("Tap to enter your dream");
         Intent myIntent = new Intent(context, DreamActivity.class);

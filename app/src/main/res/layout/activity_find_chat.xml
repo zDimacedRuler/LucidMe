@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="7"
-            android:background="@color/colorAccent"
+            android:background="#00838F"
             android:gravity="center"
             android:text="SEND"
             android:textColor="#fff" />

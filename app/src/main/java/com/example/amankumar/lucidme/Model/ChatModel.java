@@ -1,8 +1,8 @@
 package com.example.amankumar.lucidme.Model;
 
 import com.example.amankumar.lucidme.Utils.Constants;
-import com.google.firebase.database.ServerValue;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
@@ -19,8 +19,10 @@ public class ChatModel {
     public ChatModel(String userName, String lastMessage) {
         this.userName = userName;
         this.lastMessage = lastMessage;
+        GregorianCalendar calendar=(GregorianCalendar) GregorianCalendar.getInstance();
+        long milli=calendar.getTimeInMillis();
         HashMap<String,Object> obj=new HashMap<>();
-        obj.put(Constants.CONSTANT_TIMESTAMP, ServerValue.TIMESTAMP);
+        obj.put(Constants.CONSTANT_TIMESTAMP,0-milli);
         lastUpdatedTimeStamp=obj;
     }
 

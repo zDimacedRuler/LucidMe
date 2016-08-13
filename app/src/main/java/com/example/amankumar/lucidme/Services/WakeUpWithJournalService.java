@@ -29,7 +29,7 @@ public class WakeUpWithJournalService extends IntentService {
         notification=new NotificationCompat.Builder(this.getApplicationContext());
         notification.setAutoCancel(true);
         notification.setTicker("Tap to enter you dream");
-        notification.setSmallIcon(R.mipmap.ic_lucidme);
+        notification.setSmallIcon(R.drawable.ic_lucidme_notif);
         notification.setWhen(System.currentTimeMillis());
         notification.setSound(sound);
         notification.setContentTitle("Its time to record your dream");

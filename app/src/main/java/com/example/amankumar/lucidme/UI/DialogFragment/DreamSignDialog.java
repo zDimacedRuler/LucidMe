@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,7 +42,6 @@ public class DreamSignDialog extends DialogFragment {
     ArrayList<String> selectedItems;
     SharedPreferences sp;
     String encodedEmail;
-    ArrayAdapter<String> stringArrayAdapter;
     Query query;
 
     public DreamSignDialog() {

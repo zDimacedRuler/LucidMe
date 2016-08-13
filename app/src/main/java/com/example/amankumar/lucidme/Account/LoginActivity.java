@@ -1,11 +1,13 @@
 package com.example.amankumar.lucidme.Account;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -46,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user!=null)
+                if (user != null)
                     takeUserToDreamJournalActivity();
             }
         };
@@ -91,12 +93,12 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         mProgressDialog.show();
-        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 mProgressDialog.dismiss();
-                spe.putString(Constants.CURRENT_USER,encodedEmail).apply();
-                if(!task.isSuccessful()){
+                spe.putString(Constants.CURRENT_USER, encodedEmail).apply();
+                if (!task.isSuccessful()) {
                     showErrorToast(task.getException().getMessage());
                 }
             }
@@ -141,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(authStateListener!=null){
+        if (authStateListener != null) {
             mAuth.removeAuthStateListener(authStateListener);
         }
     }
@@ -156,5 +158,38 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showErrorToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+    public void ResetPasswordButtonHandler(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reset Password?");
+        builder.setMessage("Send the new password link in your mail id?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                email = emailEdit.getText().toString().toLowerCase();
+                if (email.equals("")) {
+                    emailEdit.setError("Email cannot be empty");
+                    return;
+                }
+                mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Email sent", Toast.LENGTH_SHORT).show();
+                        }else
+                            Toast.makeText(LoginActivity.this, "Email could not be sent", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

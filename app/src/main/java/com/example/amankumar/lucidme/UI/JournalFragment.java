@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,10 +37,10 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 public class JournalFragment extends Fragment {
-    String currentUser;
+    String currentUser,sortBy;
+    int sortState;
     SharedPreferences sp;
     FirebaseDatabase ref;
-
     DatabaseReference dreamRef, userDreamRef;
     RecyclerView dreamRecyclerView;
     Query query;
@@ -66,6 +67,7 @@ public class JournalFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_journal, container, false);
         sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         currentUser = sp.getString(Constants.CURRENT_USER, "");
+        sortState=sp.getInt(Constants.SORT_STATE,0);
         dreamRecyclerView = (RecyclerView) view.findViewById(R.id.dreamRecyclerView);
         noDreamCardView = (CardView) view.findViewById(R.id.DF_no_dream_card_view);
         ref = FirebaseDatabase.getInstance();
@@ -76,7 +78,20 @@ public class JournalFragment extends Fragment {
                 if (dataSnapshot.child(Constants.LOCATION_DREAMS).exists()) {
                     noDreamCardView.setVisibility(View.GONE);
                     userDreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser).child(Constants.LOCATION_DREAMS);
-                    query = userDreamRef.orderByChild("dateOfDream");
+                    switch (sortState){
+                        case 0:
+                            query = userDreamRef.orderByChild("revDateOfDream");
+                            break;
+                        case 1:
+                            query = userDreamRef.orderByChild("timeStampLastChanged/timestamp");
+                            break;
+                        case 2:
+                            query = userDreamRef.orderByChild("titleDream");
+                            break;
+                        case 3:
+                            query = userDreamRef.orderByChild("dateOfDream");
+                            break;
+                    }
                     recyclerViewAdapter = new RecyclerViewAdapter(Dream.class, R.layout.listview, RecyclerViewHolder.class, query);
                     dreamRecyclerView.setLayoutManager(new NpaGridLayoutManager(getActivity()));
                     dreamRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
@@ -91,13 +106,25 @@ public class JournalFragment extends Fragment {
 
             }
         });
+        setHasOptionsMenu(true);
         return view;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        getActivity().getMenuInflater().inflate(R.menu.menu_home, menu);
+        inflater.inflate(R.menu.menu_journal_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        /*switch (item.getItemId()) {
+            case R.id.JF_search:
+                Intent intent = new Intent(getActivity(), SearchableActivity.class);
+                startActivity(intent);
+                return true;
+        }*/
+        return super.onOptionsItemSelected(item);
     }
 
     public class RecyclerViewAdapter extends FirebaseRecyclerAdapter<Dream, RecyclerViewHolder> {

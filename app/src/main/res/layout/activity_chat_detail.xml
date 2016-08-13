@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     android:focusable="true"
     android:focusableInTouchMode="true"
     tools:context="com.example.amankumar.lucidme.UI.Chat.ChatDetailActivity">
@@ -17,9 +18,18 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/CD_message_linear"
         android:layout_below="@+id/Cd_appBar"
+        android:layout_marginBottom="5dp"
         android:stackFromBottom="true"
         android:transcriptMode="alwaysScroll" />
-
+    <View
+        android:id="@+id/CD_divider"
+        style="@style/Black_Divider"
+        android:layout_above="@id/CD_message_linear"/>
+    <View
+        style="@style/Black_Divider"
+        android:layout_below="@+id/CD_divider"
+        android:layout_marginTop="2dp"
+       />
     <LinearLayout
         android:id="@+id/CD_message_linear"
         android:layout_width="match_parent"
@@ -48,7 +58,7 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom"
             android:layout_weight="10"
-            android:background="@color/colorAccent"
+            android:background="#00838F"
             android:onClick="sendMessageHandler"
             android:src="@drawable/ic_send_white_24dp" />
     </LinearLayout>

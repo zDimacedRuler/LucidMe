@@ -1,17 +1,14 @@
 package com.example.amankumar.lucidme.UI;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -28,18 +25,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.amankumar.lucidme.Account.LoginActivity;
 import com.example.amankumar.lucidme.R;
+import com.example.amankumar.lucidme.Services.MessageNotificationService;
 import com.example.amankumar.lucidme.UI.Chat.ChatFragment;
 import com.example.amankumar.lucidme.UI.Chat.FindChatActivity;
+import com.example.amankumar.lucidme.UI.Search.SearchableActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
+import com.example.amankumar.lucidme.Utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,21 +45,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     private static final int ADD_DREAM = 1;
     private static final int RESULT_DONE = 1;
-    private static final int SELECT_PICTURE = 100;
-    private static final int height = 300;
-    private static final int width = 300;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
@@ -74,12 +66,12 @@ public class HomeActivity extends AppCompatActivity {
     FirebaseDatabase ref;
     DatabaseReference userRef;
     FirebaseAuth mAuth;
-    FirebaseStorage firebaseStorage;
-    StorageReference storageReference, profileRef;
     FirebaseAuth.AuthStateListener mAuthStateListener;
     String currentUser;
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton floatingActionButton;
+    Bitmap profilePic;
+    Boolean pinState;
     boolean doubleBackToExitPressedOnce = false;
 
     @Override
@@ -128,8 +120,6 @@ public class HomeActivity extends AppCompatActivity {
         currentUser = sp.getString(Constants.CURRENT_USER, "");
         ref = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReferenceFromUrl(Constants.FIREBASE_STORAGE_URL);
         headerView = navigationView.getHeaderView(0);
         imageView = (ImageView) headerView.findViewById(R.id.nav_avatar);
         userNameText = (TextView) headerView.findViewById(R.id.nav_username);
@@ -143,36 +133,41 @@ public class HomeActivity extends AppCompatActivity {
                     spe.putString(Constants.CURRENT_USER, null).apply();
                     spe.putString(Constants.CURRENT_USER_NAME, null).apply();
                     takeUserToLoginScreenOnUnAuth();
+                } else {
+                    userRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
+                    userRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String name = dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString();
+                            SharedPreferences.Editor spe = sp.edit();
+                            spe.putString(Constants.CURRENT_USER_NAME, name).apply();
+                            userNameText.setText(name);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
         };
-        imageView.setOnClickListener(new View.OnClickListener() {
+        mAuth.addAuthStateListener(mAuthStateListener);
+        userNameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //code to pick image
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent,
-                        "Select Picture"), SELECT_PICTURE);
+                Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
+                startActivity(intent);
             }
         });
-        mAuth.addAuthStateListener(mAuthStateListener);
-        userRef = ref.getReference().child(Constants.LOCATION_USERS).child(currentUser);
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = dataSnapshot.child(Constants.LOCATION_USERNAME).getValue().toString();
-                SharedPreferences.Editor spe = sp.edit();
-                spe.putString(Constants.CURRENT_USER_NAME, name).apply();
-                userNameText.setText(name);
-            }
+        if (!isMyServiceRunning(MessageNotificationService.class)) {
+            startNotificationService();
+        }
+    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    private void startNotificationService() {
+        Intent notificationIntent = new Intent(this, MessageNotificationService.class);
+        startService(notificationIntent);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -214,7 +209,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setCheckedItem(R.id.nav_journal);
+        navigationView.setCheckedItem(R.id.nav_home);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -229,15 +224,17 @@ public class HomeActivity extends AppCompatActivity {
                                 Intent dreamSignsIntent = new Intent(HomeActivity.this, DreamSignActivity.class);
                                 startActivity(dreamSignsIntent);
                                 break;
-                            case R.id.nav_journal:
-                                viewPager.setCurrentItem(0);
-                                break;
-                            case R.id.nav_dream_chat:
-                                viewPager.setCurrentItem(1);
-                                break;
                             case R.id.nav_explore:
-                                Intent exploreIntent = new Intent(HomeActivity.this, ExploreActivity.class);
+                                Intent exploreIntent = new Intent(HomeActivity.this, ChooseWebsiteActivity.class);
                                 startActivity(exploreIntent);
+                                break;
+                            case R.id.nav_analysis:
+                                Intent analysisIntent = new Intent(HomeActivity.this, AnalysisActivity.class);
+                                startActivity(analysisIntent);
+                                break;
+                            case R.id.nav_about:
+                                Intent aboutIntent = new Intent(HomeActivity.this, AboutActivity.class);
+                                startActivity(aboutIntent);
                                 break;
                         }
                         return true;
@@ -246,11 +243,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return true;
+    protected void onResume() {
+        super.onResume();
+        pinState = sp.getBoolean(Constants.PIN_STATE, false);
+        if (pinState)
+            Utils.lockAppCheck(this);
+        String fileName = currentUser + ".png";
+        profilePic = getThumbnail(fileName);
+        if (profilePic != null)
+            imageView.setImageBitmap(profilePic);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (pinState)
+            Utils.lockAppStoreTime(this);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -259,8 +269,14 @@ public class HomeActivity extends AppCompatActivity {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
-            case R.id.action_logout:
-                FirebaseAuth.getInstance().signOut();
+            case R.id.JF_search:
+                Intent intent = new Intent(this, SearchableActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.JF_settings:
+            case R.id.CF_settings:
+                Intent settingIntent = new Intent(HomeActivity.this, SettingsActivity.class);
+                startActivity(settingIntent);
                 break;
         }
         return true;
@@ -295,56 +311,8 @@ public class HomeActivity extends AppCompatActivity {
                 Snackbar.make(floatingActionButton, "Unable to store empty Dream ", Snackbar.LENGTH_SHORT).show();
             }
         }
-        if (resultCode == RESULT_OK) {
-            if (requestCode == SELECT_PICTURE) {
-                //code to put image in firebase
-                Uri selectedImageUri = data.getData();
-                profileRef = storageReference.child(currentUser).child(Constants.CONSTANT_PROFILE_PIC);
-                if (Build.VERSION.SDK_INT < 19) {
-                    String selectedImagePath = getPath(selectedImageUri);
-                    Glide.with(HomeActivity.this).load(selectedImagePath).into(imageView);
-                } else {
-                    ParcelFileDescriptor parcelFileDescriptor;
-                    try {
-                        parcelFileDescriptor = getContentResolver().openFileDescriptor(selectedImageUri, "r");
-                        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-                        bmpFactoryOptions.inJustDecodeBounds = true;
-                        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmpFactoryOptions);
-                        int heightRatio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) height);
-                        int widthRatio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) width);
-                        if (heightRatio > 1 || widthRatio > 1) {
-                            if (heightRatio > widthRatio) {
-                                bmpFactoryOptions.inSampleSize = heightRatio;
-                            } else {
-                                bmpFactoryOptions.inSampleSize = widthRatio;
-                            }
-                        }
-                        bmpFactoryOptions.inJustDecodeBounds = false;
-                        image = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmpFactoryOptions);
-                        imageView.setImageBitmap(image);
-                        parcelFileDescriptor.close();
-                        /*UploadTask uploadTask = profileRef.putFile(imageUri);
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("HomeActivity:", "Upload failed");
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Log.d("HomeActivity:", "Upload successful");
-                            }
-                        });*/
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -364,19 +332,30 @@ public class HomeActivity extends AppCompatActivity {
         }, 2000);
     }
 
-    public String getPath(Uri uri) {
-        if (uri == null) {
-            return null;
-        }
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int column_index = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        }
-        return uri.getPath();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAuth.removeAuthStateListener(mAuthStateListener);
     }
 
+    public Bitmap getThumbnail(String filename) {
+        Bitmap thumbnail = null;
+        try {
+            File filePath = getFileStreamPath(filename);
+            FileInputStream fi = new FileInputStream(filePath);
+            thumbnail = BitmapFactory.decodeStream(fi);
+        } catch (Exception ex) {
+        }
+        return thumbnail;
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

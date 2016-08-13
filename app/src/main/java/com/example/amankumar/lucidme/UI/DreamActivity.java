@@ -56,7 +56,7 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
     String title, dream, encodedEmail, lucidState;
     long milliSeconds;
     FirebaseDatabase ref;
-    DatabaseReference dreamDetailRef,addDreamRef;
+    DatabaseReference dreamDetailRef, addDreamRef;
     SharedPreferences sp;
     ArrayList<String> dreamSigns;
     CardView tagCardView;
@@ -66,6 +66,8 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
     static TextView datePickerButton;
     private static final int RESULT_DONE = 1;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    boolean pinState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +106,7 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         tagText = (TextView) findViewById(R.id.Dream_tagTextView);
         tagCardView = (CardView) findViewById(R.id.dream_tag_card_view);
         lucidState = "False";
-        ref =FirebaseDatabase.getInstance();
+        ref = FirebaseDatabase.getInstance();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         encodedEmail = sp.getString(Constants.CURRENT_USER, null);
         showCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -114,15 +116,15 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         listId = "";
         showDate();
         caller = getIntent().getStringExtra("caller");
-        if (caller!=null && caller.equals("DreamDetail")) {
+        if (caller != null && caller.equals("DreamDetail")) {
             listId = getIntent().getStringExtra("listId");
-            dreamDetailRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+            dreamDetailRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
             dreamDetailRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Dream dreamModel = dataSnapshot.getValue(Dream.class);
                     //date
-                    milliSeconds=dreamModel.getDateOfDream();
+                    milliSeconds = dreamModel.getDateOfDream();
                     sendCalendar.setTimeInMillis(milliSeconds);
                     showCalendar.setTimeInMillis(milliSeconds);
                     showDate();
@@ -191,7 +193,7 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
             DialogFragment dialogFragment = DreamSignDialog.newInstance(dreamSigns);
             dialogFragment.show(getSupportFragmentManager(), "DreamSignDialogFragment");
         }
-        if(id==R.id.action_audio_input){
+        if (id == R.id.action_audio_input) {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -227,20 +229,20 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
             else
                 stringBuilder.append(dream);
         }
-        milliSeconds=sendCalendar.getTimeInMillis();
+        milliSeconds = sendCalendar.getTimeInMillis();
         Dream dreamEntry = new Dream(stringBuilder.toString(), dream, milliSeconds, obj, lucidState, lucidTechnique, additionalNotes);
         if (dream.equals("")) {
             setResult(2);
             finish();
         } else {
-            if (caller!=null && caller.equals("Home")) {
-                addDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS);
-                DatabaseReference key=addDreamRef.push();
+            if (caller != null && caller.equals("Home")) {
+                addDreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS);
+                DatabaseReference key = addDreamRef.push();
                 key.setValue(dreamEntry);
                 setResult(RESULT_DONE);
                 finish();
             } else {
-                addDreamRef=ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
+                addDreamRef = ref.getReference().child(Constants.LOCATION_USERS).child(encodedEmail).child(Constants.LOCATION_DREAMS).child(listId);
                 addDreamRef.setValue(dreamEntry);
                 finish();
             }
@@ -300,7 +302,8 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         storeDream();
         super.onBackPressed();
     }
-    public void discardChanges(){
+
+    public void discardChanges() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Attention Required");
         builder.setMessage("Changes are not saved.Save your changes?");
@@ -332,7 +335,6 @@ public class DreamActivity extends AppCompatActivity implements DreamSignDialog.
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
-
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     dreamEdit.append(result.get(0));
