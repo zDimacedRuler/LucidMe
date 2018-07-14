@@ -1,7 +1,5 @@
 package com.example.amankumar.lucidme.UI;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -18,7 +16,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -30,11 +27,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.amankumar.lucidme.Account.LoginActivity;
 import com.example.amankumar.lucidme.R;
-import com.example.amankumar.lucidme.Services.MessageNotificationService;
-import com.example.amankumar.lucidme.UI.Chat.ChatFragment;
-import com.example.amankumar.lucidme.UI.Chat.FindChatActivity;
+import com.example.amankumar.lucidme.UI.Notes.NoteFragment;
 import com.example.amankumar.lucidme.UI.Search.SearchableActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
@@ -60,7 +56,7 @@ public class HomeActivity extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     View headerView;
-    ImageView imageView;
+    ImageView imageView,navImage;
     TextView userNameText;
     SharedPreferences sp;
     FirebaseDatabase ref;
@@ -71,7 +67,7 @@ public class HomeActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton floatingActionButton;
     Bitmap profilePic;
-    Boolean pinState;
+    Boolean pinState,nightMode;
     boolean doubleBackToExitPressedOnce = false;
 
     @Override
@@ -97,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         floatingActionButton = (FloatingActionButton) findViewById(R.id.AddDreamButton);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        /*viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 0)
@@ -115,14 +111,20 @@ public class HomeActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
+        });*/
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         currentUser = sp.getString(Constants.CURRENT_USER, "");
         ref = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        nightMode = sp.getBoolean(Constants.NIGHT_MODE, false);
         headerView = navigationView.getHeaderView(0);
         imageView = (ImageView) headerView.findViewById(R.id.nav_avatar);
         userNameText = (TextView) headerView.findViewById(R.id.nav_username);
+        navImage= (ImageView) headerView.findViewById(R.id.nav_image_header);
+        if(nightMode.equals(Boolean.TRUE))
+             Glide.with(this).load(R.drawable.header).centerCrop().into(navImage);
+        else
+            Glide.with(this).load(R.drawable.header_l).centerCrop().into(navImage);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -160,20 +162,14 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        if (!isMyServiceRunning(MessageNotificationService.class)) {
-            startNotificationService();
-        }
+
     }
 
-    private void startNotificationService() {
-        Intent notificationIntent = new Intent(this, MessageNotificationService.class);
-        startService(notificationIntent);
-    }
 
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(JournalFragment.newInstance(), "Journal");
-        adapter.addFragment(ChatFragment.newInstance(), "Chat");
+        adapter.addFragment(NoteFragment.newInstance(), "Note");
         viewPager.setAdapter(adapter);
     }
 
@@ -274,10 +270,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.JF_settings:
-            case R.id.CF_settings:
-                Intent settingIntent = new Intent(HomeActivity.this, SettingsActivity.class);
-                startActivity(settingIntent);
-                break;
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
         }
         return true;
     }
@@ -297,8 +291,7 @@ public class HomeActivity extends AppCompatActivity {
             intent.putExtra("caller", "Home");
             startActivityForResult(intent, ADD_DREAM);
         } else {
-            Intent intent = new Intent(this, FindChatActivity.class);
-            startActivity(intent);
+
         }
     }
 
@@ -347,15 +340,5 @@ public class HomeActivity extends AppCompatActivity {
         } catch (Exception ex) {
         }
         return thumbnail;
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 }

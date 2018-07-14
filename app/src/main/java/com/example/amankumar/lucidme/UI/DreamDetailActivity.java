@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.example.amankumar.lucidme.Model.Dream;
 import com.example.amankumar.lucidme.R;
-import com.example.amankumar.lucidme.UI.Chat.SelectFriendActivity;
 import com.example.amankumar.lucidme.Utils.Constants;
 import com.example.amankumar.lucidme.Utils.Utils;
 import com.google.firebase.database.DataSnapshot;
@@ -180,9 +179,7 @@ public class DreamDetailActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         if (id == R.id.action_share) {
-            Intent intent = new Intent(this, SelectFriendActivity.class);
-            intent.putExtra("listId", listId);
-            startActivity(intent);
+
         }
         if (id == android.R.id.home) {
             finish();

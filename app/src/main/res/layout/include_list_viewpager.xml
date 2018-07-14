@@ -41,6 +41,7 @@
         app:layout_anchor="@id/viewpager"
         app:layout_anchorGravity="bottom|right|end"
         android:layout_margin="16dp"
+        android:src="@drawable/fab_plus"
         android:onClick="AddDreamButtonHandler"
         app:elevation="6dp"
         app:fabSize="normal" />

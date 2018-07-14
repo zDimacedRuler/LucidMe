@@ -93,18 +93,10 @@
             android:name=".Update_Password.UpdatePasswordActivity"
             android:parentActivityName=".UI.AccountActivity" />
 
-        <service
-            android:name=".Services.MessageNotificationIntentService"
-            android:exported="false" />
-
         <activity
             android:name=".UI.ChooseWebsiteActivity"
             android:parentActivityName=".UI.HomeActivity" />
 
-        <service
-            android:name=".Services.MessageNotificationService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>
